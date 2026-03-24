@@ -5,34 +5,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NewsGuard Reality Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-#ng-quiz {
-  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+body {
+  background: #f1f5f9;
+  padding: 24px 16px;
+}
+
+#quiz-wrap {
+  font-family: "Sora", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
   background: #f8fafc;
   border-radius: 14px;
-  max-width: 640px;
+  max-width: 620px;
   margin: 0 auto;
-  padding: 0 0 28px;
-  overflow: hidden;
   border: 1px solid #e2e8f0;
+  overflow: hidden;
 }
 
-.ng-progress-track {
+/* ---------- progress bar ---------- */
+#progress-track {
   background: #e2e8f0;
   height: 5px;
-  width: 100%;
 }
 
-.ng-progress-fill {
-  height: 5px;
+#progress-fill {
   background: #3355dd;
-  width: 0%;
-  transition: width 0.5s ease;
+  height: 5px;
+  width: 0;
+  transition: width 0.4s ease;
 }
 
-.ng-header {
+/* ---------- header ---------- */
+#quiz-header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -41,136 +52,145 @@
   background: #ffffff;
 }
 
-.ng-badge {
+#quiz-badge {
   background: #3355dd;
   color: #ffffff;
   font-size: 12px;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 999px;
+  letter-spacing: 0.04em;
 }
 
-.ng-header-title {
+#quiz-title {
   font-size: 14px;
   font-weight: 600;
   color: #1e293b;
 }
 
-.ng-screen {
+/* ---------- screens ---------- */
+.screen {
   display: none;
-  padding: 22px 22px 0;
+  padding: 22px;
 }
 
-.ng-screen.active {
+.screen.visible {
   display: block;
 }
 
-.ng-meta {
+/* ---------- question meta ---------- */
+.q-meta {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
 }
 
-.ng-q-label {
+.q-number {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   color: #3355dd;
 }
 
-.ng-platform {
+.q-platform {
   font-size: 11px;
   font-weight: 500;
   color: #64748b;
   background: #f1f5f9;
-  padding: 2px 9px;
+  padding: 2px 10px;
   border-radius: 999px;
 }
 
-.ng-img {
+/* ---------- image ---------- */
+.q-img {
+  display: block;
   width: 100%;
   height: auto;
   border-radius: 10px;
-  display: block;
-  margin-bottom: 16px;
   border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
 }
 
-.ng-claim-intro {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: #94a3b8;
+/* ---------- claim ---------- */
+.q-claim-label {
   display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
   margin-bottom: 6px;
 }
 
-.ng-claim {
+.q-claim {
   font-size: 15px;
   font-weight: 500;
   color: #1e293b;
-  line-height: 1.55;
+  line-height: 1.6;
   margin-bottom: 20px;
 }
 
-.ng-btn-row {
+/* ---------- answer buttons ---------- */
+.btn-row {
   display: flex;
   gap: 10px;
+  margin-bottom: 0;
 }
 
-.ng-btn {
+.btn-answer {
   flex: 1;
   padding: 13px 10px;
   border: none;
   border-radius: 10px;
-  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-family: "Sora", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  color: #ffffff;
 }
 
-.ng-btn-real { background: #22c55e; color: #ffffff; }
-.ng-btn-fake { background: #ef4444; color: #ffffff; }
+.btn-real { background: #22c55e; }
+.btn-fake { background: #ef4444; }
 
-.ng-btn.correct { outline: 3px solid #1e293b; }
-.ng-btn.dimmed { opacity: 0.3; }
-.ng-btn.locked { cursor: default; pointer-events: none; }
+.btn-answer.is-correct { outline: 3px solid #1e293b; }
+.btn-answer.is-wrong   { opacity: 0.28; }
+.btn-answer.is-locked  { cursor: default; pointer-events: none; }
 
-.ng-explanation {
+/* ---------- explanation ---------- */
+.explanation {
   display: none;
-  margin-top: 18px;
+  margin-top: 16px;
   padding: 14px 16px;
   background: #ffffff;
-  border-radius: 10px;
   border: 1px solid #e2e8f0;
+  border-radius: 10px;
 }
 
-.ng-explanation.open {
+.explanation.visible {
   display: block;
 }
 
-.ng-verdict {
-  font-size: 12px;
+.verdict {
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
   margin-bottom: 6px;
 }
 
-.ng-verdict.real { color: #22c55e; }
-.ng-verdict.fake { color: #ef4444; }
+.verdict-real { color: #22c55e; }
+.verdict-fake { color: #ef4444; }
 
-.ng-expl-text {
+.expl-text {
   font-size: 13px;
   color: #475569;
-  line-height: 1.55;
+  line-height: 1.6;
   margin-bottom: 14px;
 }
 
-.ng-next-btn {
+.btn-next {
   display: block;
   width: 100%;
   padding: 11px;
@@ -178,163 +198,167 @@
   color: #ffffff;
   border: none;
   border-radius: 9px;
-  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-family: "Sora", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
 
-.ng-final-inner {
+/* ---------- final screen ---------- */
+#screen-final .final-inner {
   text-align: center;
-  padding: 40px 22px 10px;
+  padding: 40px 22px 16px;
 }
 
-.ng-score-ring {
+.score-ring {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 90px;
-  height: 90px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   background: #eff2ff;
   border: 3px solid #3355dd;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-.ng-score-number {
-  font-size: 28px;
+.score-number {
+  font-size: 26px;
   font-weight: 700;
   color: #3355dd;
 }
 
-.ng-score-label {
-  font-size: 17px;
+.score-label {
+  font-size: 16px;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-.ng-score-sub {
+.score-sub {
   font-size: 13px;
   color: #64748b;
   line-height: 1.5;
 }
 
-@media (max-width: 420px) {
-  .ng-screen { padding: 16px 14px 0; }
-  .ng-header { padding: 14px 16px 12px; }
-  .ng-claim { font-size: 14px; }
-  .ng-btn { font-size: 13px; padding: 12px 8px; }
+/* ---------- responsive ---------- */
+@media (max-width: 400px) {
+  .screen        { padding: 16px; }
+  #quiz-header   { padding: 14px 16px; }
+  .q-claim       { font-size: 14px; }
+  .btn-answer    { font-size: 13px; padding: 11px 8px; }
 }
 </style>
 </head>
 <body>
 
-<div id="ng-quiz">
+<div id="quiz-wrap">
 
-  <div class="ng-progress-track">
-    <div class="ng-progress-fill" id="ng-progress"></div>
+  <div id="progress-track">
+    <div id="progress-fill"></div>
   </div>
 
-  <div class="ng-header">
-    <span class="ng-badge">NG</span>
-    <span class="ng-header-title">NewsGuard Reality Check</span>
+  <div id="quiz-header">
+    <span id="quiz-badge">NG</span>
+    <span id="quiz-title">NewsGuard Reality Check</span>
   </div>
 
-  <div class="ng-screen active" id="ng-q1">
-    <div class="ng-meta">
-      <span class="ng-q-label">Question 1 of 2</span>
-      <span class="ng-platform">Telegram</span>
+  <!-- Question 1 -->
+  <div class="screen visible" id="screen-1">
+    <div class="q-meta">
+      <span class="q-number">Question 1 of 2</span>
+      <span class="q-platform">Telegram</span>
     </div>
-    <img class="ng-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+1" alt="Screenshot 1">
-    <div class="ng-claim">
-      <span class="ng-claim-intro">The Claim</span>
-      "A video shows Ben Gurion Airport struck by an Iranian hypersonic missile."
+    <img class="q-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+1" alt="Screenshot 1">
+    <span class="q-claim-label">The Claim</span>
+    <p class="q-claim">"A video shows Ben Gurion Airport struck by an Iranian hypersonic missile."</p>
+    <div class="btn-row">
+      <button class="btn-answer btn-real" onclick="answer(1, 'real')">Real</button>
+      <button class="btn-answer btn-fake" onclick="answer(1, 'fake')">Fake</button>
     </div>
-    <div class="ng-btn-row">
-      <button class="ng-btn ng-btn-real" onclick="ngAnswer(1,'real')">Real</button>
-      <button class="ng-btn ng-btn-fake" onclick="ngAnswer(1,'fake')">Fake</button>
-    </div>
-    <div class="ng-explanation" id="ng-exp1">
-      <div class="ng-verdict fake">Fake</div>
-      <p class="ng-expl-text">The video was AI-generated. No such strike occurred. Analysts identified telltale rendering artifacts and found no corroborating news reports or satellite evidence of any damage at Ben Gurion Airport.</p>
-      <button class="ng-next-btn" onclick="ngNext(2)">Next question</button>
-    </div>
-  </div>
-
-  <div class="ng-screen" id="ng-q2">
-    <div class="ng-meta">
-      <span class="ng-q-label">Question 2 of 2</span>
-      <span class="ng-platform">X (formerly Twitter)</span>
-    </div>
-    <img class="ng-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+2" alt="Screenshot 2">
-    <div class="ng-claim">
-      <span class="ng-claim-intro">The Claim</span>
-      "Pro-Israel users accused the NYT of publishing an AI-generated image of crowds celebrating in Tehran."
-    </div>
-    <div class="ng-btn-row">
-      <button class="ng-btn ng-btn-real" onclick="ngAnswer(2,'real')">Real</button>
-      <button class="ng-btn ng-btn-fake" onclick="ngAnswer(2,'fake')">Fake</button>
-    </div>
-    <div class="ng-explanation" id="ng-exp2">
-      <div class="ng-verdict real">Real</div>
-      <p class="ng-expl-text">The image was authentic. The New York Times confirmed it was a genuine photograph. The accusations of AI generation were themselves false -- a coordinated attempt to discredit legitimate photojournalism.</p>
-      <button class="ng-next-btn" onclick="ngNext('final')">See my score</button>
+    <div class="explanation" id="exp-1">
+      <p class="verdict verdict-fake">Fake</p>
+      <p class="expl-text">The video was AI-generated. No such strike occurred. Analysts identified telltale rendering artifacts and found no corroborating news reports or satellite evidence of any damage at Ben Gurion Airport.</p>
+      <button class="btn-next" onclick="next(2)">Next question</button>
     </div>
   </div>
 
-  <div class="ng-screen" id="ng-final">
-    <div class="ng-final-inner">
-      <div class="ng-score-ring">
-        <span class="ng-score-number" id="ng-score-display">0/2</span>
+  <!-- Question 2 -->
+  <div class="screen" id="screen-2">
+    <div class="q-meta">
+      <span class="q-number">Question 2 of 2</span>
+      <span class="q-platform">X (formerly Twitter)</span>
+    </div>
+    <img class="q-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+2" alt="Screenshot 2">
+    <span class="q-claim-label">The Claim</span>
+    <p class="q-claim">"Pro-Israel users accused the NYT of publishing an AI-generated image of crowds celebrating in Tehran."</p>
+    <div class="btn-row">
+      <button class="btn-answer btn-real" onclick="answer(2, 'real')">Real</button>
+      <button class="btn-answer btn-fake" onclick="answer(2, 'fake')">Fake</button>
+    </div>
+    <div class="explanation" id="exp-2">
+      <p class="verdict verdict-real">Real</p>
+      <p class="expl-text">The image was authentic. The New York Times confirmed it was a genuine photograph. The accusations of AI generation were themselves false -- a coordinated attempt to discredit legitimate photojournalism.</p>
+      <button class="btn-next" onclick="next('final')">See my score</button>
+    </div>
+  </div>
+
+  <!-- Final screen -->
+  <div class="screen" id="screen-final">
+    <div class="final-inner">
+      <div class="score-ring">
+        <span class="score-number" id="score-display">0/2</span>
       </div>
-      <div class="ng-score-label" id="ng-score-label">Score</div>
-      <p class="ng-score-sub">This was a test -- full quiz coming soon.</p>
+      <p class="score-label" id="score-label">Score</p>
+      <p class="score-sub">This was a test -- full quiz coming soon.</p>
     </div>
   </div>
 
 </div>
 
 <script>
-var correct = {1: 'fake', 2: 'real'};
+var answers = { 1: "fake", 2: "real" };
 var score = 0;
 
-function ngAnswer(q, choice) {
-  var screen = document.getElementById('ng-q' + q);
-  var btns = screen.getElementsByClassName('ng-btn');
-  if (btns[0].classList.contains('locked')) { return; }
-  if (choice === correct[q]) { score++; }
+function answer(q, choice) {
+  var btns = document.getElementById("screen-" + q).getElementsByClassName("btn-answer");
+  if (btns[0].className.indexOf("is-locked") !== -1) { return; }
+
+  if (choice === answers[q]) { score = score + 1; }
+
   for (var i = 0; i < btns.length; i++) {
-    btns[i].classList.add('locked');
-    var isReal = btns[i].classList.contains('ng-btn-real');
-    var btnChoice = isReal ? 'real' : 'fake';
-    if (btnChoice === correct[q]) {
-      btns[i].classList.add('correct');
+    btns[i].className += " is-locked";
+    var isReal = btns[i].className.indexOf("btn-real") !== -1;
+    var thisChoice = isReal ? "real" : "fake";
+    if (thisChoice === answers[q]) {
+      btns[i].className += " is-correct";
     } else {
-      btns[i].classList.add('dimmed');
+      btns[i].className += " is-wrong";
     }
   }
-  document.getElementById('ng-exp' + q).classList.add('open');
-  document.getElementById('ng-progress').style.width = (q === 1 ? '50' : '100') + '%';
+
+  document.getElementById("exp-" + q).className += " visible";
+  document.getElementById("progress-fill").style.width = (q === 1 ? "50" : "100") + "%";
 }
 
-function ngNext(target) {
-  var screens = document.getElementsByClassName('ng-screen');
+function next(target) {
+  var screens = document.getElementsByClassName("screen");
   for (var i = 0; i < screens.length; i++) {
-    screens[i].classList.remove('active');
+    screens[i].className = screens[i].className.replace(" visible", "").replace("visible", "");
   }
-  if (target === 'final') {
-    document.getElementById('ng-progress').style.width = '100%';
-    var labels = [
-      '0 out of 2 -- keep practicing!',
-      '1 out of 2 -- good instincts!',
-      '2 out of 2 -- sharp eye!'
+
+  if (target === "final") {
+    document.getElementById("progress-fill").style.width = "100%";
+    var msgs = [
+      "0 out of 2 -- keep practicing!",
+      "1 out of 2 -- good instincts!",
+      "2 out of 2 -- sharp eye!"
     ];
-    document.getElementById('ng-score-display').textContent = score + '/2';
-    document.getElementById('ng-score-label').textContent = labels[score];
-    document.getElementById('ng-final').classList.add('active');
+    document.getElementById("score-display").textContent = score + "/2";
+    document.getElementById("score-label").textContent = msgs[score];
+    document.getElementById("screen-final").className += " visible";
   } else {
-    document.getElementById('ng-q' + target).classList.add('active');
+    document.getElementById("screen-" + target).className += " visible";
   }
 }
 </script>
