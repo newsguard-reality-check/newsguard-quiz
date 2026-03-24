@@ -1,0 +1,364 @@
+<!-- SUBSTACK EMBED TEST -- To embed: open a Substack post draft, click the + block, select HTML, and paste this entire file. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsGuard Reality Check</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  #ng-quiz {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: #f8fafc;
+    border-radius: 14px;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 0 28px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Progress bar */
+  .ng-progress-track {
+    background: #e2e8f0;
+    height: 5px;
+    width: 100%;
+  }
+  .ng-progress-fill {
+    height: 5px;
+    background: #3355dd;
+    transition: width 0.5s ease;
+  }
+
+  /* Header */
+  .ng-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  .ng-badge {
+    background: #3355dd;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .ng-header-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    letter-spacing: -0.01em;
+  }
+
+  /* Screens */
+  .ng-screen {
+    display: none;
+    padding: 22px 22px 0;
+    animation: ng-fadein 0.35s ease;
+  }
+  .ng-screen.active { display: block; }
+  @keyframes ng-fadein {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Question meta */
+  .ng-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .ng-q-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #3355dd;
+  }
+  .ng-platform {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+
+  /* Image */
+  .ng-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Claim */
+  .ng-claim {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1e293b;
+    line-height: 1.55;
+    margin-bottom: 20px;
+  }
+  .ng-claim-intro {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* Buttons */
+  .ng-btn-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+  .ng-btn {
+    flex: 1;
+    padding: 13px 10px;
+    border: none;
+    border-radius: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .ng-btn:active { transform: scale(0.97); }
+  .ng-btn-real { background: #22c55e; color: #fff; }
+  .ng-btn-fake { background: #ef4444; color: #fff; }
+
+  .ng-btn.correct::after { content: " Correct"; }
+  .ng-btn.dimmed { opacity: 0.3; }
+  .ng-btn.locked { cursor: default; pointer-events: none; }
+
+  /* Explanation */
+  .ng-explanation {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.45s ease, opacity 0.35s ease, margin-top 0.35s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+  .ng-explanation.open {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 18px;
+  }
+  .ng-explanation-inner {
+    padding: 14px 16px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .ng-verdict {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 6px;
+  }
+  .ng-verdict.real { color: #22c55e; }
+  .ng-verdict.fake { color: #ef4444; }
+  .ng-expl-text {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .ng-next-btn {
+    display: block;
+    width: 100%;
+    padding: 11px;
+    background: #3355dd;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .ng-next-btn:hover { opacity: 0.88; }
+
+  /* Final screen */
+  .ng-final {
+    text-align: center;
+    padding: 40px 22px 10px;
+  }
+  .ng-score-ring {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #eff2ff;
+    border: 3px solid #3355dd;
+    margin-bottom: 20px;
+  }
+  .ng-score-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #3355dd;
+  }
+  .ng-score-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+  }
+  .ng-score-sub {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 420px) {
+    .ng-screen { padding: 16px 14px 0; }
+    .ng-header { padding: 14px 16px 12px; }
+    .ng-claim { font-size: 14px; }
+    .ng-btn { font-size: 13px; padding: 12px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="ng-quiz">
+
+  <!-- Progress -->
+  <div class="ng-progress-track">
+    <div class="ng-progress-fill" id="ng-progress" style="width:0%"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="ng-header">
+    <span class="ng-badge">NG</span>
+    <span class="ng-header-title">NewsGuard Reality Check</span>
+  </div>
+
+  <!-- Question 1 -->
+  <div class="ng-screen active" id="ng-q1">
+    <div class="ng-meta">
+      <span class="ng-q-label">Question 1 of 2</span>
+      <span class="ng-platform">Telegram</span>
+    </div>
+    <img class="ng-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+1" alt="Screenshot 1">
+    <div class="ng-claim">
+      <span class="ng-claim-intro">The Claim</span>
+      "A video shows Ben Gurion Airport struck by an Iranian hypersonic missile."
+    </div>
+    <div class="ng-btn-row">
+      <button class="ng-btn ng-btn-real" onclick="ngAnswer(1,'real')">Real</button>
+      <button class="ng-btn ng-btn-fake" onclick="ngAnswer(1,'fake')">Fake</button>
+    </div>
+    <div class="ng-explanation" id="ng-exp1">
+      <div class="ng-explanation-inner">
+        <div class="ng-verdict fake">Fake</div>
+        <p class="ng-expl-text">The video was AI-generated. No such strike occurred. Analysts identified telltale rendering artifacts and found no corroborating news reports or satellite evidence of any damage at Ben Gurion Airport.</p>
+        <button class="ng-next-btn" onclick="ngNext(2)">Next question -></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question 2 -->
+  <div class="ng-screen" id="ng-q2">
+    <div class="ng-meta">
+      <span class="ng-q-label">Question 2 of 2</span>
+      <span class="ng-platform">X (formerly Twitter)</span>
+    </div>
+    <img class="ng-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+2" alt="Screenshot 2">
+    <div class="ng-claim">
+      <span class="ng-claim-intro">The Claim</span>
+      "Pro-Israel users accused the NYT of publishing an AI-generated image of crowds celebrating in Tehran."
+    </div>
+    <div class="ng-btn-row">
+      <button class="ng-btn ng-btn-real" onclick="ngAnswer(2,'real')">Real</button>
+      <button class="ng-btn ng-btn-fake" onclick="ngAnswer(2,'fake')">Fake</button>
+    </div>
+    <div class="ng-explanation" id="ng-exp2">
+      <div class="ng-explanation-inner">
+        <div class="ng-verdict real">Real</div>
+        <p class="ng-expl-text">The image was authentic. The New York Times confirmed it was a genuine photograph. The accusations of AI generation were themselves false -- a coordinated attempt to discredit legitimate photojournalism.</p>
+        <button class="ng-next-btn" onclick="ngNext('final')">See my score -></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final screen -->
+  <div class="ng-screen" id="ng-final">
+    <div class="ng-final">
+      <div class="ng-score-ring">
+        <span class="ng-score-number" id="ng-score-display">0/2</span>
+      </div>
+      <div class="ng-score-label" id="ng-score-label">Score</div>
+      <p class="ng-score-sub">This was a test -- full quiz coming soon.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var correct = { 1: 'fake', 2: 'real' };
+  var score = 0;
+
+  function ngAnswer(q, choice) {
+    var screen = document.getElementById('ng-q' + q);
+    var btns = screen.querySelectorAll('.ng-btn');
+    var isCorrect = (choice === correct[q]);
+    if (isCorrect) score++;
+
+    btns.forEach(function (btn) {
+      btn.classList.add('locked');
+      var btnChoice = btn.classList.contains('ng-btn-real') ? 'real' : 'fake';
+      if (btnChoice === correct[q]) {
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('dimmed');
+      }
+    });
+
+    var exp = document.getElementById('ng-exp' + q);
+    exp.classList.add('open');
+
+    var pct = q === 1 ? 50 : 100;
+    document.getElementById('ng-progress').style.width = pct + '%';
+  }
+
+  function ngNext(target) {
+    var screens = document.querySelectorAll('.ng-screen');
+    screens.forEach(function (s) { s.classList.remove('active'); });
+
+    if (target === 'final') {
+      document.getElementById('ng-progress').style.width = '100%';
+      var labels = ['0 out of 2 -- keep practicing!', '1 out of 2 -- good instincts!', '2 out of 2 -- sharp eye!'];
+      document.getElementById('ng-score-display').textContent = score + '/2';
+      document.getElementById('ng-score-label').textContent = labels[score];
+      document.getElementById('ng-final').classList.add('active');
+    } else {
+      document.getElementById('ng-q' + target).classList.add('active');
+    }
+  }
+
+  window.ngAnswer = ngAnswer;
+  window.ngNext = ngNext;
+})();
+</script>
+
+</body>
+</html>
