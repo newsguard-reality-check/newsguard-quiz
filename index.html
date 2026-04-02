@@ -115,7 +115,6 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* MEDIA */
   .media-wrap {
     width: 100%;
     background: #0f172a;
@@ -150,13 +149,7 @@
     z-index: 2;
   }
 
-  .media-type-label .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: white;
-    opacity: 0.8;
-  }
+  .media-type-label .dot { width: 6px; height: 6px; border-radius: 50%; background: white; opacity: 0.8; }
 
   .claim-section { padding: 20px 24px 0; }
   .claim-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--ng-blue); text-transform: uppercase; margin-bottom: 6px; }
@@ -219,7 +212,6 @@
   .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
   .next-btn.visible { display: block; }
 
-  /* SCREENS */
   .screen {
     width: 100%;
     max-width: 680px;
@@ -235,7 +227,7 @@
 
   .screen h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
   .screen h1 span { color: var(--ng-blue); }
-  .screen p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 420px; margin: 0 auto 24px; }
+  .screen p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 440px; margin: 0 auto 24px; }
 
   .primary-btn {
     background: var(--ng-blue);
@@ -252,34 +244,6 @@
     display: inline-block;
   }
   .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
-
-  .secondary-btn {
-    background: var(--white);
-    color: var(--ng-blue);
-    border: 2px solid var(--ng-blue);
-    border-radius: 10px;
-    font-family: 'Sora', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 12px 28px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.12s;
-  }
-  .secondary-btn:hover { background: var(--ng-blue-light); transform: translateY(-1px); }
-
-  .ghost-btn {
-    background: transparent;
-    color: var(--ng-blue);
-    border: none;
-    font-family: 'Sora', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 10px 20px;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .ghost-btn:hover { color: var(--ng-blue-dark); }
 
   .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
 
@@ -312,7 +276,6 @@
 
   .score-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
 
-  /* ENTRY FORM */
   .entry-form { text-align: left; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
   .entry-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
   .entry-form p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
@@ -355,7 +318,6 @@
   .submitted-msg { text-align: center; padding: 16px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; margin-top: 16px; }
   .error-msg { text-align: center; padding: 12px; background: var(--fake-light); border-radius: 10px; color: #7f1d1d; font-size: 13px; margin-top: 12px; }
 
-  /* ADMIN */
   .admin-input {
     width: 100%; max-width: 280px;
     border: 1px solid var(--border); border-radius: 8px;
@@ -375,7 +337,6 @@
     align-items: flex-end;
     justify-content: center;
     animation: fadeOverlay 0.2s ease;
-    padding: 0;
   }
 
   @keyframes fadeOverlay {
@@ -430,41 +391,67 @@
   }
   .modal-close:hover { background: var(--border); }
 
-  .modal-body { padding: 24px 24px 0; }
+  .modal-body { padding: 8px 24px 0; }
 
   .explanation-item {
     padding: 20px 0;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
   }
   .explanation-item:last-child { border-bottom: none; }
 
-  .exp-header {
+  /* THUMBNAIL */
+  .exp-thumb {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #0f172a;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    justify-content: center;
+    position: relative;
   }
 
-  .exp-num {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--muted);
-    min-width: 24px;
+  .exp-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
-  .exp-claim {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    flex: 1;
-    line-height: 1.4;
+  .exp-thumb-video {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e293b;
+    color: white;
+    font-size: 22px;
   }
+
+  .exp-content { flex: 1; min-width: 0; }
+
+  .exp-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .exp-num { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 24px; padding-top: 2px; }
+
+  .exp-claim { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; line-height: 1.4; }
 
   .verdict-pill {
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.5px;
-    padding: 4px 10px;
+    padding: 3px 9px;
     border-radius: 99px;
     flex-shrink: 0;
     text-transform: uppercase;
@@ -473,12 +460,7 @@
   .verdict-real { background: var(--real-light); color: var(--real); }
   .verdict-fake { background: var(--fake-light); color: var(--fake); }
 
-  .exp-text {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.65;
-    padding-left: 34px;
-  }
+  .exp-text { font-size: 13px; color: var(--muted); line-height: 1.65; padding-left: 32px; }
 
   .hidden { display: none !important; }
 
@@ -487,6 +469,7 @@
     .claim-text { font-size: 15px; }
     .btn { font-size: 14px; padding: 12px 0; }
     .screen { padding: 28px 20px; }
+    .exp-thumb { width: 60px; height: 46px; }
   }
 </style>
 </head>
@@ -504,7 +487,7 @@
 <!-- START SCREEN -->
 <div class="screen" id="startScreen">
   <h1>Can you spot the <span>misinformation</span>?</h1>
-  <p>Ten images and videos circulated online during the Iran war. Some are real. Some are fake. Your time will be recorded — the highest score in the shortest time wins a NewsGuard hat.</p>
+  <p>Ten images and videos circulated online during the Iran war. Some are real. Some are fake. Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap. When you're done, you can review explanations for the right answers.</p>
   <button class="primary-btn" onclick="startQuiz()">Start Quiz →</button>
   <div class="start-meta">10 questions · Timer starts when you begin</div>
   <div style="margin-top:24px">
@@ -550,11 +533,10 @@
 
   <div class="score-actions">
     <button class="primary-btn" onclick="openExplanations()">See Full Explanations</button>
-    <button class="secondary-btn" onclick="retryQuiz()">Try Again</button>
   </div>
 
   <div class="entry-form" id="entryForm">
-    <h3>🎩 Enter for a chance to win a NewsGuard hat</h3>
+    <h3>🎩 Enter for a chance to win a NewsGuard cap</h3>
     <p>Top scorer with the fastest time wins. Enter your name and email to be considered — no obligation.</p>
     <div class="form-field">
       <label>Full Name</label>
@@ -720,9 +702,7 @@
     document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
 
     const mediaWrap = document.getElementById('mediaWrap');
-    const labelIcon = q.type === 'video' ? '▶' : '◼';
     const labelText = q.type === 'video' ? 'Video' : 'Image';
-
     if (q.type === 'video') {
       mediaWrap.innerHTML = `
         <div class="media-type-label"><span class="dot"></span>${labelText}</div>
@@ -780,7 +760,7 @@
     const pct = score / questions.length;
     let tier, desc;
     if (pct === 1)       { tier = "Misinformation Expert";         desc = "Perfect score. You identified every claim correctly. You have a sharp eye for disinformation."; }
-    else if (pct >= 0.8) { tier = "Highly Discerning Reader";      desc = "You caught most of the misinformation. A few slipped by, but your instincts are strong."; }
+    else if (pct >= 0.8) { tier = "Highly Discerning Reader";      desc = "You caught most of the misinformation. Some slipped by, but your instincts are strong."; }
     else if (pct >= 0.6) { tier = "Informed but Vulnerable";       desc = "You identified many claims correctly, but some misinformation got through. Keep questioning what you see online."; }
     else if (pct >= 0.4) { tier = "Susceptible to Misinformation"; desc = "Several fake claims fooled you. Wartime misinformation is sophisticated — always verify before sharing."; }
     else                 { tier = "High Risk Reader";               desc = "Most fake claims got through. In fast-moving conflicts, misinformation spreads quickly."; }
@@ -799,8 +779,6 @@
     btn.disabled = false;
     btn.textContent = 'Submit Entry';
   }
-
-  function retryQuiz() { startQuiz(); }
 
   function submitEntry() {
     const name = document.getElementById('entryName').value.trim();
@@ -848,19 +826,25 @@
     }
   }
 
-  // MODAL
   function openExplanations() {
     const body = document.getElementById('modalBody');
-    body.innerHTML = questions.map((q, i) => `
-      <div class="explanation-item">
-        <div class="exp-header">
-          <div class="exp-num">Q${i+1}</div>
-          <div class="exp-claim">${esc(q.claim)}</div>
-          <div class="verdict-pill verdict-${q.answer.toLowerCase()}">${q.answer}</div>
-        </div>
-        <div class="exp-text">${esc(q.explanation)}</div>
-      </div>
-    `).join('');
+    body.innerHTML = questions.map((q, i) => {
+      const thumbHtml = q.type === 'image'
+        ? `<img src="${IMAGE_BASE_URL}${q.file}" alt="Q${i+1} thumbnail" />`
+        : `<div class="exp-thumb-video">▶</div>`;
+      return `
+        <div class="explanation-item">
+          <div class="exp-thumb">${thumbHtml}</div>
+          <div class="exp-content">
+            <div class="exp-header">
+              <div class="exp-num">Q${i+1}</div>
+              <div class="exp-claim">${esc(q.claim)}</div>
+              <div class="verdict-pill verdict-${q.answer.toLowerCase()}">${q.answer}</div>
+            </div>
+            <div class="exp-text">${esc(q.explanation)}</div>
+          </div>
+        </div>`;
+    }).join('');
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
   }
