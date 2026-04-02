@@ -115,6 +115,7 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* MEDIA */
   .media-wrap {
     width: 100%;
     background: #0f172a;
@@ -124,10 +125,38 @@
     min-height: 220px;
     max-height: 380px;
     overflow: hidden;
+    position: relative;
   }
 
   .media-wrap img { width: 100%; max-height: 380px; object-fit: contain; display: block; }
   .media-wrap video { width: 100%; max-height: 380px; display: block; background: #000; }
+
+  .media-type-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    backdrop-filter: blur(4px);
+    z-index: 2;
+  }
+
+  .media-type-label .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0.8;
+  }
 
   .claim-section { padding: 20px 24px 0; }
   .claim-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--ng-blue); text-transform: uppercase; margin-bottom: 6px; }
@@ -160,7 +189,7 @@
   .feedback {
     margin: 0 24px 24px;
     border-radius: 10px;
-    padding: 16px 18px;
+    padding: 14px 18px;
     font-size: 14px;
     line-height: 1.6;
     display: none;
@@ -169,7 +198,7 @@
 
   .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
   .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; display: block; }
-  .feedback-verdict { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
+  .feedback-verdict { font-weight: 700; font-size: 15px; }
 
   .next-btn {
     display: none;
@@ -190,6 +219,7 @@
   .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
   .next-btn.visible { display: block; }
 
+  /* SCREENS */
   .screen {
     width: 100%;
     max-width: 680px;
@@ -218,6 +248,8 @@
     padding: 14px 36px;
     cursor: pointer;
     transition: background 0.15s, transform 0.12s;
+    text-decoration: none;
+    display: inline-block;
   }
   .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
 
@@ -234,6 +266,20 @@
     transition: background 0.15s, transform 0.12s;
   }
   .secondary-btn:hover { background: var(--ng-blue-light); transform: translateY(-1px); }
+
+  .ghost-btn {
+    background: transparent;
+    color: var(--ng-blue);
+    border: none;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .ghost-btn:hover { color: var(--ng-blue-dark); }
 
   .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
 
@@ -264,6 +310,9 @@
 
   .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
 
+  .score-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
+
+  /* ENTRY FORM */
   .entry-form { text-align: left; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
   .entry-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
   .entry-form p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
@@ -296,10 +345,6 @@
     cursor: pointer;
     margin-top: 4px;
     transition: background 0.15s, opacity 0.15s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
   }
   .form-submit:hover:not(:disabled) { background: var(--ng-blue-dark); }
   .form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -310,21 +355,130 @@
   .submitted-msg { text-align: center; padding: 16px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; margin-top: 16px; }
   .error-msg { text-align: center; padding: 12px; background: var(--fake-light); border-radius: 10px; color: #7f1d1d; font-size: 13px; margin-top: 12px; }
 
+  /* ADMIN */
   .admin-input {
-    width: 100%;
-    max-width: 280px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-family: 'Sora', sans-serif;
-    font-size: 15px;
-    margin: 16px 0 10px;
-    outline: none;
-    text-align: center;
-    letter-spacing: 2px;
+    width: 100%; max-width: 280px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-family: 'Sora', sans-serif; font-size: 15px;
+    margin: 16px 0 10px; outline: none; text-align: center; letter-spacing: 2px;
   }
   .admin-input:focus { border-color: var(--ng-blue); }
   .admin-error { color: var(--fake); font-size: 13px; margin-top: 10px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeOverlay 0.2s ease;
+    padding: 0;
+  }
+
+  @keyframes fadeOverlay {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .modal {
+    background: var(--white);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 0 0 40px 0;
+    animation: slideUp 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header {
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+  }
+
+  .modal-title { font-size: 17px; font-weight: 800; color: var(--text); }
+
+  .modal-close {
+    background: var(--bg);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .modal-close:hover { background: var(--border); }
+
+  .modal-body { padding: 24px 24px 0; }
+
+  .explanation-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .explanation-item:last-child { border-bottom: none; }
+
+  .exp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .exp-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 24px;
+  }
+
+  .exp-claim {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .verdict-pill {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  .verdict-real { background: var(--real-light); color: var(--real); }
+  .verdict-fake { background: var(--fake-light); color: var(--fake); }
+
+  .exp-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    padding-left: 34px;
+  }
 
   .hidden { display: none !important; }
 
@@ -350,7 +504,7 @@
 <!-- START SCREEN -->
 <div class="screen" id="startScreen">
   <h1>Can you spot the <span>misinformation</span>?</h1>
-  <p>Ten images and videos circulated online during the Iran war. Some are real. Some are fake. Your time will be recorded — the highest score in the shortest time wins a gift card.</p>
+  <p>Ten images and videos circulated online during the Iran war. Some are real. Some are fake. Your time will be recorded — the highest score in the shortest time wins a NewsGuard hat.</p>
   <button class="primary-btn" onclick="startQuiz()">Start Quiz →</button>
   <div class="start-meta">10 questions · Timer starts when you begin</div>
   <div style="margin-top:24px">
@@ -382,7 +536,6 @@
   </div>
   <div class="feedback" id="feedback">
     <div class="feedback-verdict" id="feedbackVerdict"></div>
-    <div id="feedbackText"></div>
   </div>
   <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
 </div>
@@ -395,8 +548,13 @@
   <div class="time-display" id="timeDisplay"></div>
   <p id="scoreDesc"></p>
 
+  <div class="score-actions">
+    <button class="primary-btn" onclick="openExplanations()">See Full Explanations</button>
+    <button class="secondary-btn" onclick="retryQuiz()">Try Again</button>
+  </div>
+
   <div class="entry-form" id="entryForm">
-    <h3>🎁 Enter for a chance to win a gift card</h3>
+    <h3>🎩 Enter for a chance to win a NewsGuard hat</h3>
     <p>Top scorer with the fastest time wins. Enter your name and email to be considered — no obligation.</p>
     <div class="form-field">
       <label>Full Name</label>
@@ -414,16 +572,12 @@
   <div class="submitted-msg hidden" id="submittedMsg">
     ✓ Entry submitted! We'll contact you if you win.
   </div>
-
-  <div style="margin-top:20px">
-    <button class="secondary-btn" onclick="retryQuiz()">Try Again</button>
-  </div>
 </div>
 
 <!-- ADMIN LOGIN -->
 <div class="screen hidden" id="adminLogin">
   <h1>Admin <span>Access</span></h1>
-  <p>Enter the password to view the leaderboard in Google Sheets.</p>
+  <p>Enter the password to access the leaderboard.</p>
   <input class="admin-input" type="password" id="adminPassword" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
   <br>
   <button class="primary-btn" onclick="checkAdmin()">Enter</button>
@@ -435,14 +589,25 @@
 <!-- ADMIN DASHBOARD -->
 <div class="screen hidden" id="adminDashboard">
   <h1>🏆 <span>Leaderboard</span></h1>
-  <p style="margin-bottom:8px">All entries are saved to your Google Sheet in real time.</p>
-  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn" style="display:inline-block; text-decoration:none; margin-bottom:8px;">Open Google Sheets →</a>
-  <br>
-  <div style="margin-top:8px; font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin-left:auto; margin-right:auto;">
-    Entries are ranked by score (highest first), then time (fastest first). Sort column D descending, then column E ascending to find your winner.
+  <p>All entries are saved to your Google Sheet in real time.</p>
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn">Open Google Sheets →</a>
+  <br><br>
+  <div style="font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin:0 auto;">
+    To find the winner: sort column D (Score) descending, then column E (Time in seconds) ascending.
   </div>
   <br><br>
   <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- EXPLANATIONS MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title">Full Explanations</div>
+      <button class="modal-close" onclick="closeExplanations()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
 </div>
 
 <script>
@@ -456,7 +621,7 @@
       file: "claim-01.mp4", type: "video",
       claim: "Iranian missiles striking a U.S. Navy ship in the Strait of Hormuz",
       answer: "Fake",
-      explanation: "This video is from a video game. A mouse cursor is visible in the first seconds of the video, indicating it is a recording of a game played on a desktop computer. Iran has not hit a U.S. Navy ship in the Strait of Hormuz."
+      explanation: "This video is from a video game. A mouse cursor is visible in the first seconds of the video, indicating that the video is a recording of a game played on a desktop computer. Despite claims from pro-Iranian users citing this video, Iran has not hit a U.S. Navy ship in the Strait of Hormuz."
     },
     {
       file: "claim-02.jpg", type: "image",
@@ -474,13 +639,13 @@
       file: "claim-04.jpg", type: "image",
       claim: "An Iranian missile inscribed with the phrase \"No Kings\"",
       answer: "Fake",
-      explanation: "The image is AI-generated. The style of the supposed inscription — featuring multiple unrefined lines — does not match the style or tone of authentic inscriptions that Iran has previously placed on missiles."
+      explanation: "The image is AI-generated. The style of the supposed inscription — featuring multiple unrefined lines — does not match the style or tone of authentic inscriptions that Iran has previously placed on missiles. Pro-Iran and pro-Israel accounts cited this image to claim that Iran was supporting \"No Kings\" protests against U.S. President Trump."
     },
     {
       file: "claim-05.mp4", type: "video",
       claim: "Dozens of Iranian missiles striking Tel Aviv",
       answer: "Fake",
-      explanation: "The video is AI-generated. Despite purportedly showing Tel Aviv in the middle of the day, the residential street is entirely deserted and no other shouting is heard besides the voice behind the camera. The siren does not match the sound of Israel's actual alert sirens."
+      explanation: "The video is AI-generated. Despite purportedly showing Tel Aviv in the middle of the day, the residential street is entirely deserted, and no other shouting is heard besides the voice behind the camera. The siren does not match the sound of Israel's actual alert sirens. Pro-Iran accounts cited this video to depict Israel as weak."
     },
     {
       file: "claim-06.jpg", type: "image",
@@ -498,13 +663,13 @@
       file: "claim-08.jpg", type: "image",
       claim: "An Iranian missile striking the USS Abraham Lincoln",
       answer: "Fake",
-      explanation: "This photo is from May 2006, showing the intentional sinking of the decommissioned USS Oriskany in the Gulf of Mexico to create an artificial reef. Iran did not strike the USS Abraham Lincoln."
+      explanation: "This photo is from May 2006, showing the intentional sinking of the decommissioned USS Oriskany in the Gulf of Mexico to create an artificial reef. Contrary to claims from pro-Iran accounts citing this image, Iran did not strike the USS Abraham Lincoln."
     },
     {
       file: "claim-09.mp4", type: "video",
       claim: "An Iranian missile strikes the CIA headquarters in Dubai",
       answer: "Fake",
-      explanation: "The video shows a 2015 fire in a residential building in Sharjah, United Arab Emirates. Iran did not strike a CIA building in Dubai."
+      explanation: "The video shows a 2015 fire in a residential building in Sharjah, United Arab Emirates. Contrary to claims from pro-Iran accounts citing this video, Iran did not strike a CIA building in Dubai."
     },
     {
       file: "claim-10.jpg", type: "image",
@@ -555,9 +720,18 @@
     document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
 
     const mediaWrap = document.getElementById('mediaWrap');
-    mediaWrap.innerHTML = q.type === 'video'
-      ? `<video controls playsinline src="${VIDEO_BASE_URL}${q.file}"></video>`
-      : `<img src="${IMAGE_BASE_URL}${q.file}" alt="Claim image" />`;
+    const labelIcon = q.type === 'video' ? '▶' : '◼';
+    const labelText = q.type === 'video' ? 'Video' : 'Image';
+
+    if (q.type === 'video') {
+      mediaWrap.innerHTML = `
+        <div class="media-type-label"><span class="dot"></span>${labelText}</div>
+        <video controls playsinline src="${VIDEO_BASE_URL}${q.file}"></video>`;
+    } else {
+      mediaWrap.innerHTML = `
+        <div class="media-type-label"><span class="dot"></span>${labelText}</div>
+        <img src="${IMAGE_BASE_URL}${q.file}" alt="Claim image" />`;
+    }
 
     document.getElementById('claimText').textContent = q.claim;
     document.getElementById('btnReal').disabled = false;
@@ -579,11 +753,12 @@
 
     document.getElementById('btnReal').disabled = true;
     document.getElementById('btnFake').disabled = true;
+
+    const feedback = document.getElementById('feedback');
     document.getElementById('feedbackVerdict').textContent = correct
       ? `✓ Correct — This is ${q.answer}`
       : `✗ Incorrect — This is actually ${q.answer}`;
-    document.getElementById('feedbackText').textContent = q.explanation;
-    document.getElementById('feedback').className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+    feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
 
     const nextBtn = document.getElementById('nextBtn');
     nextBtn.textContent = current < questions.length - 1 ? 'Next Question →' : 'See My Results →';
@@ -620,8 +795,9 @@
     document.getElementById('submitError').classList.add('hidden');
     document.getElementById('entryName').value = '';
     document.getElementById('entryEmail').value = '';
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').textContent = 'Submit Entry';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = false;
+    btn.textContent = 'Submit Entry';
   }
 
   function retryQuiz() { startQuiz(); }
@@ -637,19 +813,11 @@
     btn.textContent = 'Submitting…';
     document.getElementById('submitError').classList.add('hidden');
 
-    const payload = {
-      name,
-      email,
-      score,
-      seconds: elapsedSeconds,
-      timeFormatted: formatTime(elapsedSeconds)
-    };
-
     fetch(SHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ name, email, score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds) })
     })
     .then(() => {
       document.getElementById('entryForm').classList.add('hidden');
@@ -678,6 +846,36 @@
     } else {
       document.getElementById('adminError').classList.remove('hidden');
     }
+  }
+
+  // MODAL
+  function openExplanations() {
+    const body = document.getElementById('modalBody');
+    body.innerHTML = questions.map((q, i) => `
+      <div class="explanation-item">
+        <div class="exp-header">
+          <div class="exp-num">Q${i+1}</div>
+          <div class="exp-claim">${esc(q.claim)}</div>
+          <div class="verdict-pill verdict-${q.answer.toLowerCase()}">${q.answer}</div>
+        </div>
+        <div class="exp-text">${esc(q.explanation)}</div>
+      </div>
+    `).join('');
+    document.getElementById('modalOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeExplanations() {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeExplanations();
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
