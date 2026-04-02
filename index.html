@@ -1,367 +1,684 @@
-<!-- SUBSTACK EMBED TEST -- To embed: open a Substack post draft, click the + block, select HTML, and paste this entire file. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NewsGuard Reality Check</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap">
+<title>NewsGuard Reality Check Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  :root {
+    --ng-blue: #3355dd;
+    --ng-blue-dark: #1e3ab8;
+    --ng-blue-light: #eef1fd;
+    --real: #16a34a;
+    --real-light: #dcfce7;
+    --fake: #dc2626;
+    --fake-light: #fee2e2;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(51,85,221,0.10);
+  }
 
-body {
-  background: #f1f5f9;
-  padding: 24px 16px;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-#quiz-wrap {
-  font-family: "Sora", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-  background: #f8fafc;
-  border-radius: 14px;
-  max-width: 620px;
-  margin: 0 auto;
-  border: 1px solid #e2e8f0;
-  overflow: hidden;
-}
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 48px 0;
+  }
 
-/* ---------- progress bar ---------- */
-#progress-track {
-  background: #e2e8f0;
-  height: 5px;
-}
+  .header {
+    width: 100%;
+    background: var(--white);
+    border-bottom: 2px solid var(--ng-blue);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(51,85,221,0.07);
+  }
 
-#progress-fill {
-  background: #3355dd;
-  height: 5px;
-  width: 0;
-  transition: width 0.4s ease;
-}
+  .ng-badge {
+    background: var(--ng-blue);
+    color: white;
+    font-weight: 800;
+    font-size: 15px;
+    border-radius: 7px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 
-/* ---------- header ---------- */
-#quiz-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 22px 14px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #ffffff;
-}
+  .header-title { font-size: 15px; font-weight: 700; color: var(--ng-blue); }
+  .header-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
 
-#quiz-badge {
-  background: #3355dd;
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-  letter-spacing: 0.04em;
-}
+  .header-timer {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ng-blue);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    background: var(--ng-blue-light);
+    padding: 6px 14px;
+    border-radius: 99px;
+  }
 
-#quiz-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1e293b;
-}
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 680px;
+    padding: 20px 24px 0;
+  }
 
-/* ---------- screens ---------- */
-.screen {
-  display: none;
-  padding: 22px;
-}
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
 
-.screen.visible {
-  display: block;
-}
+  .progress-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--ng-blue); border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
 
-/* ---------- question meta ---------- */
-.q-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 20px 24px 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: fadeUp 0.35s cubic-bezier(.4,0,.2,1);
+  }
 
-.q-number {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #3355dd;
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-.q-platform {
-  font-size: 11px;
-  font-weight: 500;
-  color: #64748b;
-  background: #f1f5f9;
-  padding: 2px 10px;
-  border-radius: 999px;
-}
+  .media-wrap {
+    width: 100%;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    max-height: 380px;
+    overflow: hidden;
+  }
 
-/* ---------- image ---------- */
-.q-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  margin-bottom: 16px;
-}
+  .media-wrap img { width: 100%; max-height: 380px; object-fit: contain; display: block; }
+  .media-wrap video { width: 100%; max-height: 380px; display: block; background: #000; }
 
-/* ---------- claim ---------- */
-.q-claim-label {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
-  margin-bottom: 6px;
-}
+  .claim-section { padding: 20px 24px 0; }
+  .claim-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--ng-blue); text-transform: uppercase; margin-bottom: 6px; }
+  .claim-text { font-size: 17px; font-weight: 600; line-height: 1.45; color: var(--text); }
 
-.q-claim {
-  font-size: 15px;
-  font-weight: 500;
-  color: #1e293b;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
+  .btn-row { display: flex; gap: 12px; padding: 20px 24px 24px; }
 
-/* ---------- answer buttons ---------- */
-.btn-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 0;
-}
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 14px 0;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
 
-.btn-answer {
-  flex: 1;
-  padding: 13px 10px;
-  border: none;
-  border-radius: 10px;
-  font-family: "Sora", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  color: #ffffff;
-}
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.13); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-real { background: var(--real); color: white; }
+  .btn-fake { background: var(--fake); color: white; }
 
-.btn-real { background: #22c55e; }
-.btn-fake { background: #ef4444; }
+  .feedback {
+    margin: 0 24px 24px;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+    animation: fadeUp 0.25s ease;
+  }
 
-.btn-answer.is-correct { outline: 3px solid #1e293b; }
-.btn-answer.is-wrong   { opacity: 0.28; }
-.btn-answer.is-locked  { cursor: default; pointer-events: none; }
+  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
+  .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; display: block; }
+  .feedback-verdict { font-weight: 700; font-size: 15px; margin-bottom: 5px; }
 
-/* ---------- explanation ---------- */
-.explanation {
-  display: none;
-  margin-top: 16px;
-  padding: 14px 16px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-}
+  .next-btn {
+    display: none;
+    width: calc(100% - 48px);
+    margin: 0 24px 24px;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
 
-.explanation.visible {
-  display: block;
-}
+  .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+  .next-btn.visible { display: block; }
 
-.verdict {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 6px;
-}
+  .screen {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+    margin: 20px 24px 0;
+  }
 
-.verdict-real { color: #22c55e; }
-.verdict-fake { color: #ef4444; }
+  .screen h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+  .screen h1 span { color: var(--ng-blue); }
+  .screen p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 420px; margin: 0 auto 24px; }
 
-.expl-text {
-  font-size: 13px;
-  color: #475569;
-  line-height: 1.6;
-  margin-bottom: 14px;
-}
+  .primary-btn {
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
 
-.btn-next {
-  display: block;
-  width: 100%;
-  padding: 11px;
-  background: #3355dd;
-  color: #ffffff;
-  border: none;
-  border-radius: 9px;
-  font-family: "Sora", -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
+  .secondary-btn {
+    background: var(--white);
+    color: var(--ng-blue);
+    border: 2px solid var(--ng-blue);
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .secondary-btn:hover { background: var(--ng-blue-light); transform: translateY(-1px); }
 
-/* ---------- final screen ---------- */
-#screen-final .final-inner {
-  text-align: center;
-  padding: 40px 22px 16px;
-}
+  .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
 
-.score-ring {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: #eff2ff;
-  border: 3px solid #3355dd;
-  margin-bottom: 18px;
-}
+  .score-badge {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--ng-blue);
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(51,85,221,0.25);
+  }
 
-.score-number {
-  font-size: 26px;
-  font-weight: 700;
-  color: #3355dd;
-}
+  .score-tier {
+    font-size: 14px;
+    color: var(--ng-blue);
+    font-weight: 600;
+    background: var(--ng-blue-light);
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
 
-.score-label {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-}
+  .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
 
-.score-sub {
-  font-size: 13px;
-  color: #64748b;
-  line-height: 1.5;
-}
+  .entry-form { text-align: left; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
+  .entry-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .entry-form p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 
-/* ---------- responsive ---------- */
-@media (max-width: 400px) {
-  .screen        { padding: 16px; }
-  #quiz-header   { padding: 14px 16px; }
-  .q-claim       { font-size: 14px; }
-  .btn-answer    { font-size: 13px; padding: 11px 8px; }
-}
+  .form-field { margin-bottom: 12px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-field input:focus { border-color: var(--ng-blue); }
+
+  .form-submit {
+    width: 100%;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .form-submit:hover:not(:disabled) { background: var(--ng-blue-dark); }
+  .form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .skip-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .skip-link:hover { color: var(--ng-blue); }
+
+  .submitted-msg { text-align: center; padding: 16px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; margin-top: 16px; }
+  .error-msg { text-align: center; padding: 12px; background: var(--fake-light); border-radius: 10px; color: #7f1d1d; font-size: 13px; margin-top: 12px; }
+
+  .admin-input {
+    width: 100%;
+    max-width: 280px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    margin: 16px 0 10px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .admin-input:focus { border-color: var(--ng-blue); }
+  .admin-error { color: var(--fake); font-size: 13px; margin-top: 10px; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .card, .screen, .progress-bar-wrap { margin-left: 12px; margin-right: 12px; }
+    .claim-text { font-size: 15px; }
+    .btn { font-size: 14px; padding: 12px 0; }
+    .screen { padding: 28px 20px; }
+  }
 </style>
 </head>
 <body>
 
-<div id="quiz-wrap">
+<div class="header">
+  <div class="ng-badge">NG</div>
+  <div>
+    <div class="header-title">NewsGuard Reality Check</div>
+    <div class="header-sub">Real or Fake?</div>
+  </div>
+  <div class="header-timer hidden" id="headerTimer">0:00</div>
+</div>
 
-  <div id="progress-track">
-    <div id="progress-fill"></div>
+<!-- START SCREEN -->
+<div class="screen" id="startScreen">
+  <h1>Can you spot the <span>misinformation</span>?</h1>
+  <p>Ten images and videos circulated online during the Iran war. Some are real. Some are fake. Your time will be recorded — the highest score in the shortest time wins a gift card.</p>
+  <button class="primary-btn" onclick="startQuiz()">Start Quiz →</button>
+  <div class="start-meta">10 questions · Timer starts when you begin</div>
+  <div style="margin-top:24px">
+    <a class="skip-link" onclick="showAdminLogin()">Admin access</a>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap hidden" id="progressWrap">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 of 10</span>
+    <span id="scoreLabel">0 correct</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="card hidden" id="questionCard">
+  <div class="media-wrap" id="mediaWrap"></div>
+  <div class="claim-section">
+    <div class="claim-label">Claim</div>
+    <div class="claim-text" id="claimText"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-real" id="btnReal" onclick="answer('Real')">✓ Real</button>
+    <button class="btn btn-fake" id="btnFake" onclick="answer('Fake')">✗ Fake</button>
+  </div>
+  <div class="feedback" id="feedback">
+    <div class="feedback-verdict" id="feedbackVerdict"></div>
+    <div id="feedbackText"></div>
+  </div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+</div>
+
+<!-- SCORE SCREEN -->
+<div class="screen hidden" id="scoreScreen">
+  <div class="score-badge" id="scoreBadge"></div>
+  <h1 id="scoreTitle"></h1>
+  <div class="score-tier" id="scoreTier"></div>
+  <div class="time-display" id="timeDisplay"></div>
+  <p id="scoreDesc"></p>
+
+  <div class="entry-form" id="entryForm">
+    <h3>🎁 Enter for a chance to win a gift card</h3>
+    <p>Top scorer with the fastest time wins. Enter your name and email to be considered — no obligation.</p>
+    <div class="form-field">
+      <label>Full Name</label>
+      <input type="text" id="entryName" placeholder="Your name" />
+    </div>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="entryEmail" placeholder="your@email.com" />
+    </div>
+    <button class="form-submit" id="submitBtn" onclick="submitEntry()">Submit Entry</button>
+    <div class="error-msg hidden" id="submitError">Something went wrong. Please try again.</div>
+    <a class="skip-link" onclick="skipEntry()">Skip — just show my results</a>
   </div>
 
-  <div id="quiz-header">
-    <span id="quiz-badge">NG</span>
-    <span id="quiz-title">NewsGuard Reality Check</span>
+  <div class="submitted-msg hidden" id="submittedMsg">
+    ✓ Entry submitted! We'll contact you if you win.
   </div>
 
-  <!-- Question 1 -->
-  <div class="screen visible" id="screen-1">
-    <div class="q-meta">
-      <span class="q-number">Question 1 of 2</span>
-      <span class="q-platform">Telegram</span>
-    </div>
-    <img class="q-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+1" alt="Screenshot 1">
-    <span class="q-claim-label">The Claim</span>
-    <p class="q-claim">"A video shows Ben Gurion Airport struck by an Iranian hypersonic missile."</p>
-    <div class="btn-row">
-      <button class="btn-answer btn-real" onclick="answer(1, 'real')">Real</button>
-      <button class="btn-answer btn-fake" onclick="answer(1, 'fake')">Fake</button>
-    </div>
-    <div class="explanation" id="exp-1">
-      <p class="verdict verdict-fake">Fake</p>
-      <p class="expl-text">The video was AI-generated. No such strike occurred. Analysts identified telltale rendering artifacts and found no corroborating news reports or satellite evidence of any damage at Ben Gurion Airport.</p>
-      <button class="btn-next" onclick="next(2)">Next question</button>
-    </div>
+  <div style="margin-top:20px">
+    <button class="secondary-btn" onclick="retryQuiz()">Try Again</button>
   </div>
+</div>
 
-  <!-- Question 2 -->
-  <div class="screen" id="screen-2">
-    <div class="q-meta">
-      <span class="q-number">Question 2 of 2</span>
-      <span class="q-platform">X (formerly Twitter)</span>
-    </div>
-    <img class="q-img" src="https://placehold.co/600x260/e2e8f0/94a3b8?text=Screenshot+2" alt="Screenshot 2">
-    <span class="q-claim-label">The Claim</span>
-    <p class="q-claim">"Pro-Israel users accused the NYT of publishing an AI-generated image of crowds celebrating in Tehran."</p>
-    <div class="btn-row">
-      <button class="btn-answer btn-real" onclick="answer(2, 'real')">Real</button>
-      <button class="btn-answer btn-fake" onclick="answer(2, 'fake')">Fake</button>
-    </div>
-    <div class="explanation" id="exp-2">
-      <p class="verdict verdict-real">Real</p>
-      <p class="expl-text">The image was authentic. The New York Times confirmed it was a genuine photograph. The accusations of AI generation were themselves false -- a coordinated attempt to discredit legitimate photojournalism.</p>
-      <button class="btn-next" onclick="next('final')">See my score</button>
-    </div>
+<!-- ADMIN LOGIN -->
+<div class="screen hidden" id="adminLogin">
+  <h1>Admin <span>Access</span></h1>
+  <p>Enter the password to view the leaderboard in Google Sheets.</p>
+  <input class="admin-input" type="password" id="adminPassword" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
+  <br>
+  <button class="primary-btn" onclick="checkAdmin()">Enter</button>
+  <div class="admin-error hidden" id="adminError">Incorrect password. Try again.</div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="screen hidden" id="adminDashboard">
+  <h1>🏆 <span>Leaderboard</span></h1>
+  <p style="margin-bottom:8px">All entries are saved to your Google Sheet in real time.</p>
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn" style="display:inline-block; text-decoration:none; margin-bottom:8px;">Open Google Sheets →</a>
+  <br>
+  <div style="margin-top:8px; font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin-left:auto; margin-right:auto;">
+    Entries are ranked by score (highest first), then time (fastest first). Sort column D descending, then column E ascending to find your winner.
   </div>
-
-  <!-- Final screen -->
-  <div class="screen" id="screen-final">
-    <div class="final-inner">
-      <div class="score-ring">
-        <span class="score-number" id="score-display">0/2</span>
-      </div>
-      <p class="score-label" id="score-label">Score</p>
-      <p class="score-sub">This was a test -- full quiz coming soon.</p>
-    </div>
-  </div>
-
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
 </div>
 
 <script>
-var answers = { 1: "fake", 2: "real" };
-var score = 0;
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwz7j5vGV58qojLu7bJ3rP70ZMjhYHluFPsRbJDCSuYBWxF_xxV4XlgYPRIATW7s88RTA/exec";
+  const ADMIN_PASSWORD = "NewsGuard25";
+  const IMAGE_BASE_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/";
+  const VIDEO_BASE_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/";
 
-function answer(q, choice) {
-  var btns = document.getElementById("screen-" + q).getElementsByClassName("btn-answer");
-  if (btns[0].className.indexOf("is-locked") !== -1) { return; }
+  const questions = [
+    {
+      file: "claim-01.mp4", type: "video",
+      claim: "Iranian missiles striking a U.S. Navy ship in the Strait of Hormuz",
+      answer: "Fake",
+      explanation: "This video is from a video game. A mouse cursor is visible in the first seconds of the video, indicating it is a recording of a game played on a desktop computer. Iran has not hit a U.S. Navy ship in the Strait of Hormuz."
+    },
+    {
+      file: "claim-02.jpg", type: "image",
+      claim: "An Israeli airstrike in Beirut, Lebanon",
+      answer: "Real",
+      explanation: "This is an authentic image from The New York Times. The Israeli military struck the Dahiya neighborhood on March 31, 2026."
+    },
+    {
+      file: "claim-03.mp4", type: "video",
+      claim: "A funeral procession for a commander killed in Tehran, Iran",
+      answer: "Real",
+      explanation: "This is an authentic video from The New York Times. Thousands gathered in Tehran for a funeral procession for a naval commander and others killed in airstrikes."
+    },
+    {
+      file: "claim-04.jpg", type: "image",
+      claim: "An Iranian missile inscribed with the phrase \"No Kings\"",
+      answer: "Fake",
+      explanation: "The image is AI-generated. The style of the supposed inscription — featuring multiple unrefined lines — does not match the style or tone of authentic inscriptions that Iran has previously placed on missiles."
+    },
+    {
+      file: "claim-05.mp4", type: "video",
+      claim: "Dozens of Iranian missiles striking Tel Aviv",
+      answer: "Fake",
+      explanation: "The video is AI-generated. Despite purportedly showing Tel Aviv in the middle of the day, the residential street is entirely deserted and no other shouting is heard besides the voice behind the camera. The siren does not match the sound of Israel's actual alert sirens."
+    },
+    {
+      file: "claim-06.jpg", type: "image",
+      claim: "Israeli soldiers inspect an Iranian missile",
+      answer: "Real",
+      explanation: "This is an authentic image from AFP/Getty Images. Israeli soldiers inspected an Iranian missile remnant that landed in the Israeli-occupied West Bank village of Hares."
+    },
+    {
+      file: "claim-07.mp4", type: "video",
+      claim: "The aftermath of an Israeli strike in Lebanon",
+      answer: "Real",
+      explanation: "This is an authentic video from The New York Times. Emergency workers respond after an Israeli strike on a village in southern Lebanon."
+    },
+    {
+      file: "claim-08.jpg", type: "image",
+      claim: "An Iranian missile striking the USS Abraham Lincoln",
+      answer: "Fake",
+      explanation: "This photo is from May 2006, showing the intentional sinking of the decommissioned USS Oriskany in the Gulf of Mexico to create an artificial reef. Iran did not strike the USS Abraham Lincoln."
+    },
+    {
+      file: "claim-09.mp4", type: "video",
+      claim: "An Iranian missile strikes the CIA headquarters in Dubai",
+      answer: "Fake",
+      explanation: "The video shows a 2015 fire in a residential building in Sharjah, United Arab Emirates. Iran did not strike a CIA building in Dubai."
+    },
+    {
+      file: "claim-10.jpg", type: "image",
+      claim: "An Israeli airstrike in Beirut, Lebanon",
+      answer: "Real",
+      explanation: "This is an authentic image from the Associated Press. Smoke is seen rising over Beirut's southern suburbs following Israeli air strikes."
+    }
+  ];
 
-  if (choice === answers[q]) { score = score + 1; }
+  let current = 0, score = 0, answered = false;
+  let timerInterval = null, elapsedSeconds = 0;
 
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].className += " is-locked";
-    var isReal = btns[i].className.indexOf("btn-real") !== -1;
-    var thisChoice = isReal ? "real" : "fake";
-    if (thisChoice === answers[q]) {
-      btns[i].className += " is-correct";
+  function startTimer() {
+    elapsedSeconds = 0;
+    clearInterval(timerInterval);
+    document.getElementById('headerTimer').classList.remove('hidden');
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      document.getElementById('headerTimer').textContent = formatTime(elapsedSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() { clearInterval(timerInterval); }
+
+  function formatTime(s) {
+    return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+  }
+
+  function showScreen(id) {
+    ['startScreen','progressWrap','questionCard','scoreScreen','adminLogin','adminDashboard']
+      .forEach(s => { const el = document.getElementById(s); if (el) el.classList.add('hidden'); });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function startQuiz() {
+    current = 0; score = 0; answered = false;
+    showScreen('progressWrap');
+    document.getElementById('questionCard').classList.remove('hidden');
+    startTimer();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    answered = false;
+    const q = questions[current];
+    document.getElementById('progressLabel').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('scoreLabel').textContent = `${score} correct`;
+    document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
+
+    const mediaWrap = document.getElementById('mediaWrap');
+    mediaWrap.innerHTML = q.type === 'video'
+      ? `<video controls playsinline src="${VIDEO_BASE_URL}${q.file}"></video>`
+      : `<img src="${IMAGE_BASE_URL}${q.file}" alt="Claim image" />`;
+
+    document.getElementById('claimText').textContent = q.claim;
+    document.getElementById('btnReal').disabled = false;
+    document.getElementById('btnFake').disabled = false;
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('nextBtn').classList.remove('visible');
+
+    const card = document.getElementById('questionCard');
+    card.style.animation = 'none'; card.offsetHeight;
+    card.style.animation = 'fadeUp 0.35s cubic-bezier(.4,0,.2,1)';
+  }
+
+  function answer(choice) {
+    if (answered) return;
+    answered = true;
+    const q = questions[current];
+    const correct = choice === q.answer;
+    if (correct) score++;
+
+    document.getElementById('btnReal').disabled = true;
+    document.getElementById('btnFake').disabled = true;
+    document.getElementById('feedbackVerdict').textContent = correct
+      ? `✓ Correct — This is ${q.answer}`
+      : `✗ Incorrect — This is actually ${q.answer}`;
+    document.getElementById('feedbackText').textContent = q.explanation;
+    document.getElementById('feedback').className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = current < questions.length - 1 ? 'Next Question →' : 'See My Results →';
+    nextBtn.classList.add('visible');
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) showScore();
+    else loadQuestion();
+  }
+
+  function showScore() {
+    stopTimer();
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('headerTimer').classList.add('hidden');
+    showScreen('scoreScreen');
+
+    const pct = score / questions.length;
+    let tier, desc;
+    if (pct === 1)       { tier = "Misinformation Expert";         desc = "Perfect score. You identified every claim correctly. You have a sharp eye for disinformation."; }
+    else if (pct >= 0.8) { tier = "Highly Discerning Reader";      desc = "You caught most of the misinformation. A few slipped by, but your instincts are strong."; }
+    else if (pct >= 0.6) { tier = "Informed but Vulnerable";       desc = "You identified many claims correctly, but some misinformation got through. Keep questioning what you see online."; }
+    else if (pct >= 0.4) { tier = "Susceptible to Misinformation"; desc = "Several fake claims fooled you. Wartime misinformation is sophisticated — always verify before sharing."; }
+    else                 { tier = "High Risk Reader";               desc = "Most fake claims got through. In fast-moving conflicts, misinformation spreads quickly."; }
+
+    document.getElementById('scoreBadge').textContent = `${score}/10`;
+    document.getElementById('scoreTitle').textContent = score === 10 ? "Perfect Score!" : score >= 7 ? "Well Done!" : score >= 5 ? "Not Bad!" : "Keep Practicing";
+    document.getElementById('scoreTier').textContent = tier;
+    document.getElementById('scoreDesc').textContent = desc;
+    document.getElementById('timeDisplay').textContent = `⏱ Completed in ${formatTime(elapsedSeconds)}`;
+    document.getElementById('entryForm').classList.remove('hidden');
+    document.getElementById('submittedMsg').classList.add('hidden');
+    document.getElementById('submitError').classList.add('hidden');
+    document.getElementById('entryName').value = '';
+    document.getElementById('entryEmail').value = '';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'Submit Entry';
+  }
+
+  function retryQuiz() { startQuiz(); }
+
+  function submitEntry() {
+    const name = document.getElementById('entryName').value.trim();
+    const email = document.getElementById('entryEmail').value.trim();
+    if (!name || !email) { alert('Please enter both your name and email.'); return; }
+    if (!email.includes('@')) { alert('Please enter a valid email address.'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    document.getElementById('submitError').classList.add('hidden');
+
+    const payload = {
+      name,
+      email,
+      score,
+      seconds: elapsedSeconds,
+      timeFormatted: formatTime(elapsedSeconds)
+    };
+
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      document.getElementById('entryForm').classList.add('hidden');
+      document.getElementById('submittedMsg').classList.remove('hidden');
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.textContent = 'Submit Entry';
+      document.getElementById('submitError').classList.remove('hidden');
+    });
+  }
+
+  function skipEntry() {
+    document.getElementById('entryForm').classList.add('hidden');
+  }
+
+  function showAdminLogin() {
+    showScreen('adminLogin');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminError').classList.add('hidden');
+  }
+
+  function checkAdmin() {
+    if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+      showScreen('adminDashboard');
     } else {
-      btns[i].className += " is-wrong";
+      document.getElementById('adminError').classList.remove('hidden');
     }
   }
-
-  document.getElementById("exp-" + q).className += " visible";
-  document.getElementById("progress-fill").style.width = (q === 1 ? "50" : "100") + "%";
-}
-
-function next(target) {
-  var screens = document.getElementsByClassName("screen");
-  for (var i = 0; i < screens.length; i++) {
-    screens[i].className = screens[i].className.replace(" visible", "").replace("visible", "");
-  }
-
-  if (target === "final") {
-    document.getElementById("progress-fill").style.width = "100%";
-    var msgs = [
-      "0 out of 2 -- keep practicing!",
-      "1 out of 2 -- good instincts!",
-      "2 out of 2 -- sharp eye!"
-    ];
-    document.getElementById("score-display").textContent = score + "/2";
-    document.getElementById("score-label").textContent = msgs[score];
-    document.getElementById("screen-final").className += " visible";
-  } else {
-    document.getElementById("screen-" + target).className += " visible";
-  }
-}
 </script>
-
 </body>
 </html>
