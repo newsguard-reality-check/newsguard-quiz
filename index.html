@@ -53,11 +53,6 @@
   }
 
   .ng-badge {
-    background: var(--ng-blue);
-    color: white;
-    font-weight: 800;
-    font-size: 15px;
-    border-radius: 7px;
     width: 36px;
     height: 36px;
     display: flex;
@@ -66,8 +61,33 @@
     flex-shrink: 0;
   }
 
+  .ng-badge img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+
   .header-title { font-size: 15px; font-weight: 700; color: var(--ng-blue); }
   .header-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+  /* SHARE BUTTONS */
+  .share-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+  .share-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .share-btn {
+    display: flex; align-items: center; gap: 7px;
+    border: none; border-radius: 9px;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 10px 16px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+    color: white; text-decoration: none;
+  }
+  .share-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .share-btn.x-btn    { background: #000000; }
+  .share-btn.fb-btn   { background: #1877f2; }
+  .share-btn.li-btn   { background: #0a66c2; }
+  .share-btn.copy-btn { background: var(--muted); }
+  .share-btn.copy-btn.copied { background: var(--real); }
 
   .header-timer {
     margin-left: auto;
@@ -476,9 +496,9 @@
 <body>
 
 <div class="header">
-  <div class="ng-badge">NG</div>
+  <div class="ng-badge"><img src="favicon.png" alt="NewsGuard" /></div>
   <div>
-    <div class="header-title">NewsGuard Reality Check</div>
+    <div class="header-title">NewsGuard's Reality Check</div>
     <div class="header-sub">Real or Fake?</div>
   </div>
   <div class="header-timer hidden" id="headerTimer">0:00</div>
@@ -553,6 +573,16 @@
 
   <div class="submitted-msg hidden" id="submittedMsg">
     ✓ Entry submitted! We'll contact you if you win.
+  </div>
+
+  <div class="share-section">
+    <div class="share-label">Share your result</div>
+    <div class="share-buttons">
+      <button class="share-btn x-btn" onclick="shareX()">𝕏 X</button>
+      <button class="share-btn fb-btn" onclick="shareFacebook()">f Facebook</button>
+      <button class="share-btn li-btn" onclick="shareLinkedIn()">in LinkedIn</button>
+      <button class="share-btn copy-btn" id="copyBtn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
   </div>
 </div>
 
@@ -860,6 +890,33 @@
 
   function closeModalOutside(e) {
     if (e.target === document.getElementById('modalOverlay')) closeExplanations();
+  }
+
+  function shareX() {
+    const text = `I scored ${score}/10 on NewsGuard's Reality Check quiz — can you spot wartime misinformation?`;
+    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/';
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+  }
+
+  function shareFacebook() {
+    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/';
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+  }
+
+  function shareLinkedIn() {
+    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/';
+    const text = `I scored ${score}/10 on NewsGuard's Reality Check quiz — can you spot wartime misinformation?`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function copyLink() {
+    const text = `I scored ${score}/10 on NewsGuard's Reality Check quiz — can you spot wartime misinformation? https://newsguard-reality-check.github.io/newsguard-quiz/`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '🔗 Copy Link'; btn.classList.remove('copied'); }, 2500);
+    });
   }
 
   function esc(str) {
