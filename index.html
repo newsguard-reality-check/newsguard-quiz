@@ -273,7 +273,6 @@
   }
 
   .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
-
   .score-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
 
   .entry-form { text-align: left; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
@@ -402,7 +401,6 @@
   }
   .explanation-item:last-child { border-bottom: none; }
 
-  /* THUMBNAIL */
   .exp-thumb {
     flex-shrink: 0;
     width: 80px;
@@ -410,9 +408,6 @@
     border-radius: 8px;
     overflow: hidden;
     background: #0f172a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
   }
 
@@ -423,15 +418,20 @@
     display: block;
   }
 
-  .exp-thumb-video {
-    width: 100%;
-    height: 100%;
+  /* play icon overlay for video thumbnails */
+  .exp-thumb .play-overlay {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #1e293b;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .exp-thumb .play-overlay span {
+    font-size: 18px;
     color: white;
-    font-size: 22px;
+    line-height: 1;
   }
 
   .exp-content { flex: 1; min-width: 0; }
@@ -444,7 +444,6 @@
   }
 
   .exp-num { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 24px; padding-top: 2px; }
-
   .exp-claim { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; line-height: 1.4; }
 
   .verdict-pill {
@@ -600,61 +599,61 @@
 
   const questions = [
     {
-      file: "claim-01.mp4", type: "video",
+      file: "claim-01.mp4", type: "video", thumb: "claim-01-thumb.jpg",
       claim: "Iranian missiles striking a U.S. Navy ship in the Strait of Hormuz",
       answer: "Fake",
       explanation: "This video is from a video game. A mouse cursor is visible in the first seconds of the video, indicating that the video is a recording of a game played on a desktop computer. Despite claims from pro-Iranian users citing this video, Iran has not hit a U.S. Navy ship in the Strait of Hormuz."
     },
     {
-      file: "claim-02.jpg", type: "image",
+      file: "claim-02.jpg", type: "image", thumb: "claim-02.jpg",
       claim: "An Israeli airstrike in Beirut, Lebanon",
       answer: "Real",
       explanation: "This is an authentic image from The New York Times. The Israeli military struck the Dahiya neighborhood on March 31, 2026."
     },
     {
-      file: "claim-03.mp4", type: "video",
+      file: "claim-03.mp4", type: "video", thumb: "claim-03-thumb.jpg",
       claim: "A funeral procession for a commander killed in Tehran, Iran",
       answer: "Real",
       explanation: "This is an authentic video from The New York Times. Thousands gathered in Tehran for a funeral procession for a naval commander and others killed in airstrikes."
     },
     {
-      file: "claim-04.jpg", type: "image",
+      file: "claim-04.jpg", type: "image", thumb: "claim-04.jpg",
       claim: "An Iranian missile inscribed with the phrase \"No Kings\"",
       answer: "Fake",
       explanation: "The image is AI-generated. The style of the supposed inscription — featuring multiple unrefined lines — does not match the style or tone of authentic inscriptions that Iran has previously placed on missiles. Pro-Iran and pro-Israel accounts cited this image to claim that Iran was supporting \"No Kings\" protests against U.S. President Trump."
     },
     {
-      file: "claim-05.mp4", type: "video",
+      file: "claim-05.mp4", type: "video", thumb: "claim-05-thumb.jpg",
       claim: "Dozens of Iranian missiles striking Tel Aviv",
       answer: "Fake",
       explanation: "The video is AI-generated. Despite purportedly showing Tel Aviv in the middle of the day, the residential street is entirely deserted, and no other shouting is heard besides the voice behind the camera. The siren does not match the sound of Israel's actual alert sirens. Pro-Iran accounts cited this video to depict Israel as weak."
     },
     {
-      file: "claim-06.jpg", type: "image",
+      file: "claim-06.jpg", type: "image", thumb: "claim-06.jpg",
       claim: "Israeli soldiers inspect an Iranian missile",
       answer: "Real",
       explanation: "This is an authentic image from AFP/Getty Images. Israeli soldiers inspected an Iranian missile remnant that landed in the Israeli-occupied West Bank village of Hares."
     },
     {
-      file: "claim-07.mp4", type: "video",
+      file: "claim-07.mp4", type: "video", thumb: "claim-07-thumb.jpg",
       claim: "The aftermath of an Israeli strike in Lebanon",
       answer: "Real",
       explanation: "This is an authentic video from The New York Times. Emergency workers respond after an Israeli strike on a village in southern Lebanon."
     },
     {
-      file: "claim-08.jpg", type: "image",
+      file: "claim-08.jpg", type: "image", thumb: "claim-08.jpg",
       claim: "An Iranian missile striking the USS Abraham Lincoln",
       answer: "Fake",
       explanation: "This photo is from May 2006, showing the intentional sinking of the decommissioned USS Oriskany in the Gulf of Mexico to create an artificial reef. Contrary to claims from pro-Iran accounts citing this image, Iran did not strike the USS Abraham Lincoln."
     },
     {
-      file: "claim-09.mp4", type: "video",
+      file: "claim-09.mp4", type: "video", thumb: "claim-09-thumb.jpg",
       claim: "An Iranian missile strikes the CIA headquarters in Dubai",
       answer: "Fake",
       explanation: "The video shows a 2015 fire in a residential building in Sharjah, United Arab Emirates. Contrary to claims from pro-Iran accounts citing this video, Iran did not strike a CIA building in Dubai."
     },
     {
-      file: "claim-10.jpg", type: "image",
+      file: "claim-10.jpg", type: "image", thumb: "claim-10.jpg",
       claim: "An Israeli airstrike in Beirut, Lebanon",
       answer: "Real",
       explanation: "This is an authentic image from the Associated Press. Smoke is seen rising over Beirut's southern suburbs following Israeli air strikes."
@@ -829,9 +828,12 @@
   function openExplanations() {
     const body = document.getElementById('modalBody');
     body.innerHTML = questions.map((q, i) => {
-      const thumbHtml = q.type === 'image'
-        ? `<img src="${IMAGE_BASE_URL}${q.file}" alt="Q${i+1} thumbnail" />`
-        : `<div class="exp-thumb-video">▶</div>`;
+      const thumbSrc = IMAGE_BASE_URL + q.thumb;
+      const thumbHtml = q.type === 'video'
+        ? `<img src="${thumbSrc}" alt="Q${i+1} thumbnail" />
+           <div class="play-overlay"><span>▶</span></div>`
+        : `<img src="${thumbSrc}" alt="Q${i+1} thumbnail" />`;
+
       return `
         <div class="explanation-item">
           <div class="exp-thumb">${thumbHtml}</div>
@@ -845,6 +847,7 @@
           </div>
         </div>`;
     }).join('');
+
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
   }
