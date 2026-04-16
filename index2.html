@@ -418,10 +418,23 @@
 <!-- START SCREEN -->
 <div class="screen" id="startScreen">
   <h1>Real voice or <span>deepfake</span>?</h1>
-  <p>Two audio clips. One is real. One is AI-generated. For each question, label both clips — then see how well you can detect synthetic speech.</p>
-  <button class="primary-btn" onclick="startQuiz()">Start Quiz →</button>
-  <div class="start-meta">2 questions · Timer starts when you begin</div>
-  <div style="margin-top:24px">
+  <p>Two audio clips. One is from a real speech. One is AI-generated using voice cloning software. For each question, label both clips — then see how well you can detect synthetic speech.<br><br>Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap.</p>
+
+  <div class="entry-form" id="preForm" style="text-align:left; margin-top:0; border-top:none; padding-top:0;">
+    <div class="form-field">
+      <label>Full Name</label>
+      <input type="text" id="preName" placeholder="Your name" />
+    </div>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="preEmail" placeholder="your@email.com" />
+    </div>
+    <button class="primary-btn" style="width:100%; padding:14px;" onclick="beginQuiz()">Start Quiz →</button>
+    <div class="error-msg hidden" id="preError">Please enter your name and a valid email to continue.</div>
+  </div>
+
+  <div class="start-meta" style="margin-top:14px;">5 questions · Timer starts when you begin</div>
+  <div style="margin-top:16px">
     <a class="skip-link" onclick="showAdminLogin()">Admin access</a>
   </div>
 </div>
@@ -491,27 +504,7 @@
   <div class="time-display" id="timeDisplay"></div>
   <p id="scoreDesc"></p>
 
-  <div style="margin-top: 16px;">
-    <button class="primary-btn" onclick="openExplanations()">See Full Explanations</button>
-  </div>
-
-  <div class="entry-form" id="entryForm">
-    <h3>🎩 Enter for a chance to win a NewsGuard cap</h3>
-    <p>Top scorer with the fastest time wins. Enter your name and email to be considered.</p>
-    <div class="form-field">
-      <label>Full Name</label>
-      <input type="text" id="entryName" placeholder="Your name" />
-    </div>
-    <div class="form-field">
-      <label>Email Address</label>
-      <input type="email" id="entryEmail" placeholder="your@email.com" />
-    </div>
-    <button class="form-submit" id="submitBtn" onclick="submitEntry()">Submit Entry</button>
-    <div class="error-msg hidden" id="submitError">Something went wrong. Please try again.</div>
-    <a class="skip-link" onclick="skipEntry()">Skip — just show my results</a>
-  </div>
-
-  <div class="submitted-msg hidden" id="submittedMsg">✓ Entry submitted! We'll contact you if you win.</div>
+  <div class="submitted-msg" id="submittedMsg" style="margin-top:16px;">✓ Your result has been recorded. We'll contact you if you win.</div>
 
   <div class="share-section">
     <div class="share-label">Share your result</div>
@@ -549,22 +542,14 @@
   <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
 </div>
 
-<!-- EXPLANATIONS MODAL -->
-<div class="hidden" id="modalOverlay" onclick="closeModalOutside(event)" style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;">
-  <div id="modal" style="background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
-    <div style="position:sticky;top:0;background:var(--white);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:17px;font-weight:800;color:var(--text);">Full Explanations</div>
-      <button onclick="closeExplanations()" style="background:var(--bg);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;">✕</button>
-    </div>
-    <div id="modalBody" style="padding:8px 24px 0;"></div>
-  </div>
-</div>
-
 <script>
   const SHEET_URL = "https://script.google.com/macros/s/AKfycbwz7j5vGV58qojLu7bJ3rP70ZMjhYHluFPsRbJDCSuYBWxF_xxV4XlgYPRIATW7s88RTA/exec";
+  const SHEET_TAB = "VoiceCheck";
   const ADMIN_PASSWORD = "NewsGuard25";
   const AUDIO_BASE_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/";
   const QUIZ_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/index2.html";
+
+  let playerName = '', playerEmail = '';
 
   // Questions — clipA/clipB assignment is randomised at runtime below
   const questionsRaw = [
@@ -572,15 +557,31 @@
       politician: "President Donald Trump",
       context: "Speaks about Pope Leo XIV",
       realFile: "audio-01-real.m4a",
-      fakeFile: "audio-01-fake.m4a",
-      explanation: "The real clip is an authentic recording of President Trump. The deepfake was generated using a voice-cloning model — listen for subtle differences in breath patterns and the slightly mechanical quality of certain consonants."
+      fakeFile: "audio-01-fake.m4a"
     },
     {
       politician: "Former President Bill Clinton",
-      context: "Addresses the American people during his farewell address",
+      context: "Farewell address",
       realFile: "audio-02-real.m4a",
-      fakeFile: "audio-02-fake.m4a",
-      explanation: "The real clip is from Clinton's authentic farewell address. The AI-generated version mimics his cadence but lacks the natural variation in pace and emphasis characteristic of his delivery."
+      fakeFile: "audio-02-fake.m4a"
+    },
+    {
+      politician: "Former President Barack Obama",
+      context: "Remarks after a terror attack",
+      realFile: "audio-03-real.m4a",
+      fakeFile: "audio-03-fake.m4a"
+    },
+    {
+      politician: "Elon Musk",
+      context: "Speaks about American bureaucracy",
+      realFile: "audio-04-real.m4a",
+      fakeFile: "audio-04-fake.m4a"
+    },
+    {
+      politician: "President Donald Trump",
+      context: "On Iranian nuclear capabilities",
+      realFile: "audio-05-real.m4a",
+      fakeFile: "audio-05-fake.m4a"
     }
   ];
 
@@ -620,6 +621,18 @@
     ['startScreen', 'progressWrap', 'questionCard', 'scoreScreen', 'adminLogin', 'adminDashboard']
       .forEach(s => { const el = document.getElementById(s); if (el) el.classList.add('hidden'); });
     document.getElementById(id).classList.remove('hidden');
+  }
+
+  function beginQuiz() {
+    const name = document.getElementById('preName').value.trim();
+    const email = document.getElementById('preEmail').value.trim();
+    if (!name || !email || !email.includes('@')) {
+      document.getElementById('preError').classList.remove('hidden');
+      return;
+    }
+    playerName = name;
+    playerEmail = email;
+    startQuiz();
   }
 
   function startQuiz() {
@@ -708,7 +721,7 @@
       document.getElementById('feedbackVerdict').textContent = bothCorrect
         ? `✓ Correct — Clip ${q.realLabel} was the real recording`
         : `✗ Not quite — Clip ${q.realLabel} was the real recording`;
-      document.getElementById('feedbackText').textContent = q.explanation;
+      document.getElementById('feedbackText').textContent = '';
       feedback.className = `feedback ${bothCorrect ? 'correct' : 'incorrect'}`;
 
       const nextBtn = document.getElementById('nextBtn');
@@ -731,55 +744,25 @@
 
     const pct = score / questions.length;
     let tier, desc;
-    if (pct === 1)       { tier = "Sharp ear"; desc = "You identified every clip correctly. Deepfakes didn't fool you."; }
-    else if (pct >= 0.5) { tier = "Good instincts"; desc = "You caught most of the fakes. Some synthetic speech slipped by — it's getting harder to detect."; }
-    else                 { tier = "Keep practicing"; desc = "Deepfake audio is increasingly convincing. Always verify audio clips from unfamiliar sources."; }
+    if (pct === 1)       { tier = "Perfect ear";           desc = "You identified every clip correctly. Deepfakes didn't fool you once."; }
+    else if (pct >= 0.8) { tier = "Sharp instincts";       desc = "You caught almost all the fakes. Synthetic speech is getting very hard to detect."; }
+    else if (pct >= 0.6) { tier = "Good instincts";        desc = "You caught most of the fakes. A few slipped by — keep listening critically."; }
+    else if (pct >= 0.4) { tier = "Needs practice";        desc = "Some fakes fooled you. Deepfake audio is increasingly convincing — always verify."; }
+    else                 { tier = "Keep practicing";       desc = "Most fakes got through. The technology is advancing fast — stay vigilant."; }
 
     document.getElementById('scoreBadge').textContent = `${score}/${questions.length}`;
-    document.getElementById('scoreTitle').textContent = score === questions.length ? "Perfect Score!" : score > 0 ? "Not Bad!" : "Keep Practicing";
+    document.getElementById('scoreTitle').textContent = score === questions.length ? "Perfect Score!" : score >= 3 ? "Well Done!" : score >= 2 ? "Not Bad!" : "Keep Practicing";
     document.getElementById('scoreTier').textContent = tier;
     document.getElementById('scoreDesc').textContent = desc;
     document.getElementById('timeDisplay').textContent = `⏱ Completed in ${formatTime(elapsedSeconds)}`;
-    document.getElementById('entryForm').classList.remove('hidden');
-    document.getElementById('submittedMsg').classList.add('hidden');
-    document.getElementById('submitError').classList.add('hidden');
-    document.getElementById('entryName').value = '';
-    document.getElementById('entryEmail').value = '';
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = false;
-    btn.textContent = 'Submit Entry';
-  }
 
-  function submitEntry() {
-    const name = document.getElementById('entryName').value.trim();
-    const email = document.getElementById('entryEmail').value.trim();
-    if (!name || !email) { alert('Please enter both your name and email.'); return; }
-    if (!email.includes('@')) { alert('Please enter a valid email address.'); return; }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting…';
-    document.getElementById('submitError').classList.add('hidden');
-
+    // Auto-submit with pre-collected details
     fetch(SHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds) })
-    })
-    .then(() => {
-      document.getElementById('entryForm').classList.add('hidden');
-      document.getElementById('submittedMsg').classList.remove('hidden');
-    })
-    .catch(() => {
-      btn.disabled = false;
-      btn.textContent = 'Submit Entry';
-      document.getElementById('submitError').classList.remove('hidden');
-    });
-  }
-
-  function skipEntry() {
-    document.getElementById('entryForm').classList.add('hidden');
+      body: JSON.stringify({ name: playerName, email: playerEmail, score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds), sheet: SHEET_TAB })
+    }).catch(() => {});
   }
 
   function showAdminLogin() {
@@ -794,36 +777,6 @@
     } else {
       document.getElementById('adminError').classList.remove('hidden');
     }
-  }
-
-  function openExplanations() {
-    const body = document.getElementById('modalBody');
-    body.innerHTML = questions.map((q, i) => `
-      <div style="padding:20px 0;border-bottom:1px solid var(--border);${i === questions.length - 1 ? 'border-bottom:none' : ''}">
-        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
-          <span style="font-size:12px;font-weight:700;color:var(--muted);min-width:28px;padding-top:2px;">Q${i + 1}</span>
-          <div style="flex:1;">
-            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;">${esc(q.politician)}</div>
-            <div style="font-size:12px;color:var(--muted);">${esc(q.context)}</div>
-          </div>
-          <span style="font-size:11px;font-weight:700;background:var(--real-light);color:var(--real);padding:3px 10px;border-radius:99px;">Clip ${q.realLabel} = Real</span>
-        </div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.65;padding-left:38px;">${esc(q.explanation)}</div>
-      </div>
-    `).join('');
-
-    document.getElementById('modalOverlay').classList.remove('hidden');
-    document.getElementById('modalOverlay').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeExplanations() {
-    document.getElementById('modalOverlay').classList.add('hidden');
-    document.body.style.overflow = '';
-  }
-
-  function closeModalOutside(e) {
-    if (e.target === document.getElementById('modalOverlay')) closeExplanations();
   }
 
   function shareX() {
