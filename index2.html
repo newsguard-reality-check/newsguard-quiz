@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsGuard Voice Check</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ng-blue: #3355dd;
+    --ng-blue-dark: #1e3ab8;
+    --ng-blue-light: #eef1fd;
+    --real: #16a34a;
+    --real-light: #dcfce7;
+    --fake: #dc2626;
+    --fake-light: #fee2e2;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(51,85,221,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 48px 0;
+  }
+
+  .header {
+    width: 100%;
+    background: var(--white);
+    border-bottom: 2px solid var(--ng-blue);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(51,85,221,0.07);
+  }
+
+  .ng-badge { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ng-badge img { width: 36px; height: 36px; object-fit: contain; }
+  .header-title { font-size: 15px; font-weight: 700; color: var(--ng-blue); }
+  .header-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+  .header-timer {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ng-blue);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    background: var(--ng-blue-light);
+    padding: 6px 14px;
+    border-radius: 99px;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 680px;
+    padding: 20px 24px 0;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .progress-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--ng-blue); border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+
+  /* SCREEN */
+  .screen {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+    margin: 20px 24px 0;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+  .screen h1 span { color: var(--ng-blue); }
+  .screen p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 440px; margin: 0 auto 24px; }
+
+  .primary-btn {
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    display: inline-block;
+  }
+  .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+
+  .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  /* CARD */
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 20px 24px 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: fadeUp 0.35s cubic-bezier(.4,0,.2,1);
+  }
+
+  .card-head {
+    padding: 18px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-q-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ng-blue);
+    margin-bottom: 5px;
+  }
+
+  .card-politician {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.25;
+  }
+
+  .card-context {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* CLIPS */
+  .clips-section { padding: 18px 24px 0; display: flex; flex-direction: column; gap: 12px; }
+
+  .clip-divider {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .clip-row {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .clip-row.reveal-real { border-color: var(--real); background: var(--real-light); }
+  .clip-row.reveal-fake { border-color: var(--fake); background: var(--fake-light); }
+
+  .clip-row-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .clip-letter {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 20px;
+  }
+
+  .clip-audio {
+    flex: 1;
+    height: 36px;
+    display: block;
+    width: 100%;
+    accent-color: var(--ng-blue);
+  }
+
+  .clip-verdict-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 99px;
+    display: none;
+    flex-shrink: 0;
+  }
+  .clip-verdict-badge.real { background: var(--real); color: white; display: inline-block; }
+  .clip-verdict-badge.fake { background: var(--fake); color: white; display: inline-block; }
+
+  .clip-btn-row {
+    display: flex;
+    gap: 8px;
+    padding-left: 32px;
+  }
+
+  .clip-btn {
+    flex: 1;
+    padding: 9px 10px;
+    border-radius: 9px;
+    font-family: 'Sora', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s, background 0.15s;
+  }
+  .clip-btn:active { transform: scale(0.97); }
+  .clip-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  .clip-btn-real {
+    background: white;
+    color: var(--real);
+    border: 1.5px solid var(--real);
+  }
+  .clip-btn-real:hover:not(:disabled) { background: var(--real); color: white; }
+  .clip-btn-real.selected { background: var(--real); color: white; }
+
+  .clip-btn-fake {
+    background: white;
+    color: var(--fake);
+    border: 1.5px solid var(--fake);
+  }
+  .clip-btn-fake:hover:not(:disabled) { background: var(--fake); color: white; }
+  .clip-btn-fake.selected { background: var(--fake); color: white; }
+
+  /* FEEDBACK */
+  .feedback {
+    margin: 14px 24px 0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+    animation: fadeUp 0.25s ease;
+  }
+  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
+  .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; display: block; }
+  .feedback-verdict { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+
+  .next-btn {
+    display: none;
+    width: calc(100% - 48px);
+    margin: 14px 24px 24px;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+  .next-btn.visible { display: block; }
+
+  /* SCORE */
+  .score-badge {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--ng-blue);
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(51,85,221,0.25);
+  }
+
+  .score-tier {
+    font-size: 14px;
+    color: var(--ng-blue);
+    font-weight: 600;
+    background: var(--ng-blue-light);
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
+
+  .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
+
+  .entry-form { text-align: left; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
+  .entry-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .entry-form p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  .form-field { margin-bottom: 12px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    background: white;
+  }
+  .form-field input:focus { border-color: var(--ng-blue); }
+
+  .form-submit {
+    width: 100%;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .form-submit:hover:not(:disabled) { background: var(--ng-blue-dark); }
+  .form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .skip-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .skip-link:hover { color: var(--ng-blue); }
+
+  .submitted-msg { text-align: center; padding: 16px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; margin-top: 16px; }
+  .error-msg { text-align: center; padding: 12px; background: var(--fake-light); border-radius: 10px; color: #7f1d1d; font-size: 13px; margin-top: 12px; }
+
+  .share-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+  .share-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .share-btn {
+    display: flex; align-items: center; gap: 7px;
+    border: none; border-radius: 9px;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 10px 16px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+    color: white;
+  }
+  .share-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .share-btn.x-btn    { background: #000; }
+  .share-btn.fb-btn   { background: #1877f2; }
+  .share-btn.li-btn   { background: #0a66c2; }
+  .share-btn.copy-btn { background: var(--muted); }
+  .share-btn.copy-btn.copied { background: var(--real); }
+
+  .admin-input {
+    width: 100%; max-width: 280px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-family: 'Sora', sans-serif; font-size: 15px;
+    margin: 16px 0 10px; outline: none; text-align: center; letter-spacing: 2px;
+    background: white;
+  }
+  .admin-input:focus { border-color: var(--ng-blue); }
+  .admin-error { color: var(--fake); font-size: 13px; margin-top: 10px; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .card, .screen, .progress-bar-wrap { margin-left: 12px; margin-right: 12px; }
+    .card-politician { font-size: 17px; }
+    .clip-btn { font-size: 11px; padding: 8px 6px; }
+    .screen { padding: 28px 20px; }
+    .clips-section { padding: 14px 14px 0; }
+    .clip-btn-row { padding-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="ng-badge"><img src="favicon.png" alt="NewsGuard" /></div>
+  <div>
+    <div class="header-title">NewsGuard's Voice Check</div>
+    <div class="header-sub">Real Voice or Deepfake?</div>
+  </div>
+  <div class="header-timer hidden" id="headerTimer">0:00</div>
+</div>
+
+<!-- START SCREEN -->
+<div class="screen" id="startScreen">
+  <h1>Real voice or <span>deepfake</span>?</h1>
+  <p>Two audio clips. One is real. One is AI-generated. For each question, label both clips — then see how well you can detect synthetic speech.</p>
+  <button class="primary-btn" onclick="startQuiz()">Start Quiz →</button>
+  <div class="start-meta">2 questions · Timer starts when you begin</div>
+  <div style="margin-top:24px">
+    <a class="skip-link" onclick="showAdminLogin()">Admin access</a>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap hidden" id="progressWrap">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 of 2</span>
+    <span id="scoreLabel">0 correct</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="card hidden" id="questionCard">
+  <div class="card-head">
+    <div class="card-q-label" id="cardQLabel">Question 1 of 2</div>
+    <div class="card-politician" id="cardPolitician"></div>
+    <div class="card-context" id="cardContext"></div>
+  </div>
+
+  <div class="clips-section">
+    <!-- Clip A -->
+    <div class="clip-row" id="clipRowA">
+      <div class="clip-row-top">
+        <span class="clip-letter">A</span>
+        <audio class="clip-audio" controls id="audioA"></audio>
+        <span class="clip-verdict-badge" id="badgeA"></span>
+      </div>
+      <div class="clip-btn-row">
+        <button class="clip-btn clip-btn-real" id="btnA_real" onclick="handleAnswer('A','real')">✓ This is real</button>
+        <button class="clip-btn clip-btn-fake" id="btnA_fake" onclick="handleAnswer('A','fake')">✗ This is fake</button>
+      </div>
+    </div>
+
+    <div class="clip-divider">or</div>
+
+    <!-- Clip B -->
+    <div class="clip-row" id="clipRowB">
+      <div class="clip-row-top">
+        <span class="clip-letter">B</span>
+        <audio class="clip-audio" controls id="audioB"></audio>
+        <span class="clip-verdict-badge" id="badgeB"></span>
+      </div>
+      <div class="clip-btn-row">
+        <button class="clip-btn clip-btn-real" id="btnB_real" onclick="handleAnswer('B','real')">✓ This is real</button>
+        <button class="clip-btn clip-btn-fake" id="btnB_fake" onclick="handleAnswer('B','fake')">✗ This is fake</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback">
+    <div class="feedback-verdict" id="feedbackVerdict"></div>
+    <div id="feedbackText"></div>
+  </div>
+
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+</div>
+
+<!-- SCORE SCREEN -->
+<div class="screen hidden" id="scoreScreen">
+  <div class="score-badge" id="scoreBadge"></div>
+  <h1 id="scoreTitle"></h1>
+  <div class="score-tier" id="scoreTier"></div>
+  <div class="time-display" id="timeDisplay"></div>
+  <p id="scoreDesc"></p>
+
+  <div style="margin-top: 16px;">
+    <button class="primary-btn" onclick="openExplanations()">See Full Explanations</button>
+  </div>
+
+  <div class="entry-form" id="entryForm">
+    <h3>🎩 Enter for a chance to win a NewsGuard cap</h3>
+    <p>Top scorer with the fastest time wins. Enter your name and email to be considered.</p>
+    <div class="form-field">
+      <label>Full Name</label>
+      <input type="text" id="entryName" placeholder="Your name" />
+    </div>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="entryEmail" placeholder="your@email.com" />
+    </div>
+    <button class="form-submit" id="submitBtn" onclick="submitEntry()">Submit Entry</button>
+    <div class="error-msg hidden" id="submitError">Something went wrong. Please try again.</div>
+    <a class="skip-link" onclick="skipEntry()">Skip — just show my results</a>
+  </div>
+
+  <div class="submitted-msg hidden" id="submittedMsg">✓ Entry submitted! We'll contact you if you win.</div>
+
+  <div class="share-section">
+    <div class="share-label">Share your result</div>
+    <div class="share-buttons">
+      <button class="share-btn x-btn" onclick="shareX()">𝕏 X</button>
+      <button class="share-btn fb-btn" onclick="shareFacebook()">f Facebook</button>
+      <button class="share-btn li-btn" onclick="shareLinkedIn()">in LinkedIn</button>
+      <button class="share-btn copy-btn" id="copyBtn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="screen hidden" id="adminLogin">
+  <h1>Admin <span>Access</span></h1>
+  <p>Enter the password to access the leaderboard.</p>
+  <input class="admin-input" type="password" id="adminPassword" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
+  <br>
+  <button class="primary-btn" onclick="checkAdmin()">Enter</button>
+  <div class="admin-error hidden" id="adminError">Incorrect password. Try again.</div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="screen hidden" id="adminDashboard">
+  <h1>🏆 <span>Leaderboard</span></h1>
+  <p>All entries are saved to your Google Sheet in real time.</p>
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn">Open Google Sheets →</a>
+  <br><br>
+  <div style="font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin:0 auto;">
+    To find the winner: sort column D (Score) descending, then column E (Time in seconds) ascending.
+  </div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- EXPLANATIONS MODAL -->
+<div class="hidden" id="modalOverlay" onclick="closeModalOutside(event)" style="position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;">
+  <div id="modal" style="background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;padding:0 0 40px;box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
+    <div style="position:sticky;top:0;background:var(--white);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:17px;font-weight:800;color:var(--text);">Full Explanations</div>
+      <button onclick="closeExplanations()" style="background:var(--bg);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="modalBody" style="padding:8px 24px 0;"></div>
+  </div>
+</div>
+
+<script>
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwz7j5vGV58qojLu7bJ3rP70ZMjhYHluFPsRbJDCSuYBWxF_xxV4XlgYPRIATW7s88RTA/exec";
+  const ADMIN_PASSWORD = "NewsGuard25";
+  const AUDIO_BASE_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/";
+  const QUIZ_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/index2.html";
+
+  // Questions — clipA/clipB assignment is randomised at runtime below
+  const questionsRaw = [
+    {
+      politician: "President Donald Trump",
+      context: "Speaks about Pope Leo XIV",
+      realFile: "audio-01-real.m4a",
+      fakeFile: "audio-01-fake.m4a",
+      explanation: "The real clip is an authentic recording of President Trump. The deepfake was generated using a voice-cloning model — listen for subtle differences in breath patterns and the slightly mechanical quality of certain consonants."
+    },
+    {
+      politician: "Former President Bill Clinton",
+      context: "Addresses the American people during his farewell address",
+      realFile: "audio-02-real.m4a",
+      fakeFile: "audio-02-fake.m4a",
+      explanation: "The real clip is from Clinton's authentic farewell address. The AI-generated version mimics his cadence but lacks the natural variation in pace and emphasis characteristic of his delivery."
+    }
+  ];
+
+  // Randomise which clip is A and which is B for each question
+  const questions = questionsRaw.map(q => {
+    const realIsA = Math.random() < 0.5;
+    return {
+      ...q,
+      clipA: { file: realIsA ? q.realFile : q.fakeFile, isReal: realIsA },
+      clipB: { file: realIsA ? q.fakeFile : q.realFile, isReal: !realIsA },
+      realLabel: realIsA ? 'A' : 'B'
+    };
+  });
+
+  let current = 0, score = 0;
+  let timerInterval = null, elapsedSeconds = 0;
+  // Track whether both clips in a question have been answered
+  let answeredClips = {};
+
+  function startTimer() {
+    elapsedSeconds = 0;
+    clearInterval(timerInterval);
+    document.getElementById('headerTimer').classList.remove('hidden');
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      document.getElementById('headerTimer').textContent = formatTime(elapsedSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() { clearInterval(timerInterval); }
+
+  function formatTime(s) {
+    return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+  }
+
+  function showScreen(id) {
+    ['startScreen', 'progressWrap', 'questionCard', 'scoreScreen', 'adminLogin', 'adminDashboard']
+      .forEach(s => { const el = document.getElementById(s); if (el) el.classList.add('hidden'); });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function startQuiz() {
+    current = 0; score = 0;
+    showScreen('progressWrap');
+    document.getElementById('questionCard').classList.remove('hidden');
+    startTimer();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    answeredClips = { A: false, B: false };
+    const q = questions[current];
+    const total = questions.length;
+
+    document.getElementById('progressLabel').textContent = `Question ${current + 1} of ${total}`;
+    document.getElementById('scoreLabel').textContent = `${score} correct`;
+    document.getElementById('progressFill').style.width = `${(current / total) * 100}%`;
+    document.getElementById('cardQLabel').textContent = `Question ${current + 1} of ${total}`;
+    document.getElementById('cardPolitician').textContent = q.politician;
+    document.getElementById('cardContext').textContent = q.context;
+
+    document.getElementById('audioA').src = AUDIO_BASE_URL + q.clipA.file;
+    document.getElementById('audioB').src = AUDIO_BASE_URL + q.clipB.file;
+
+    ['A', 'B'].forEach(c => {
+      document.getElementById(`clipRow${c}`).className = 'clip-row';
+      ['real', 'fake'].forEach(type => {
+        const btn = document.getElementById(`btn${c}_${type}`);
+        btn.disabled = false;
+        btn.className = `clip-btn clip-btn-${type}`;
+      });
+      const badge = document.getElementById(`badge${c}`);
+      badge.className = 'clip-verdict-badge';
+      badge.textContent = '';
+    });
+
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('nextBtn').className = 'next-btn';
+
+    const card = document.getElementById('questionCard');
+    card.style.animation = 'none'; card.offsetHeight;
+    card.style.animation = 'fadeUp 0.35s cubic-bezier(.4,0,.2,1)';
+  }
+
+  function handleAnswer(clip, choice) {
+    if (answeredClips[clip]) return;
+    answeredClips[clip] = true;
+
+    const q = questions[current];
+    const clipObj = clip === 'A' ? q.clipA : q.clipB;
+    const isCorrect = (clipObj.isReal === (choice === 'real'));
+
+    // Style the selected button
+    const selectedBtn = document.getElementById(`btn${clip}_${choice}`);
+    selectedBtn.classList.add('selected');
+
+    // Disable both buttons for this clip
+    document.getElementById(`btn${clip}_real`).disabled = true;
+    document.getElementById(`btn${clip}_fake`).disabled = true;
+
+    // Show badge on the clip row
+    const row = document.getElementById(`clipRow${clip}`);
+    const badge = document.getElementById(`badge${clip}`);
+    if (clipObj.isReal) {
+      row.classList.add('reveal-real');
+      badge.textContent = 'Real';
+      badge.className = 'clip-verdict-badge real';
+    } else {
+      row.classList.add('reveal-fake');
+      badge.textContent = 'Fake';
+      badge.className = 'clip-verdict-badge fake';
+    }
+
+    // Check if both clips answered
+    if (answeredClips.A && answeredClips.B) {
+      // Score: award 1 point if both clips labelled correctly
+      const aCorrect = (questions[current].clipA.isReal === (document.getElementById('btnA_real').classList.contains('selected')));
+      const bCorrect = (questions[current].clipB.isReal === (document.getElementById('btnB_real').classList.contains('selected')));
+      const bothCorrect = aCorrect && bCorrect;
+      if (bothCorrect) score++;
+
+      document.getElementById('scoreLabel').textContent = `${score} correct`;
+
+      const feedback = document.getElementById('feedback');
+      document.getElementById('feedbackVerdict').textContent = bothCorrect
+        ? `✓ Correct — Clip ${q.realLabel} was the real recording`
+        : `✗ Not quite — Clip ${q.realLabel} was the real recording`;
+      document.getElementById('feedbackText').textContent = q.explanation;
+      feedback.className = `feedback ${bothCorrect ? 'correct' : 'incorrect'}`;
+
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.textContent = current < questions.length - 1 ? 'Next Question →' : 'See My Results →';
+      nextBtn.className = 'next-btn visible';
+    }
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) showScore();
+    else loadQuestion();
+  }
+
+  function showScore() {
+    stopTimer();
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('headerTimer').classList.add('hidden');
+    showScreen('scoreScreen');
+
+    const pct = score / questions.length;
+    let tier, desc;
+    if (pct === 1)       { tier = "Sharp ear"; desc = "You identified every clip correctly. Deepfakes didn't fool you."; }
+    else if (pct >= 0.5) { tier = "Good instincts"; desc = "You caught most of the fakes. Some synthetic speech slipped by — it's getting harder to detect."; }
+    else                 { tier = "Keep practicing"; desc = "Deepfake audio is increasingly convincing. Always verify audio clips from unfamiliar sources."; }
+
+    document.getElementById('scoreBadge').textContent = `${score}/${questions.length}`;
+    document.getElementById('scoreTitle').textContent = score === questions.length ? "Perfect Score!" : score > 0 ? "Not Bad!" : "Keep Practicing";
+    document.getElementById('scoreTier').textContent = tier;
+    document.getElementById('scoreDesc').textContent = desc;
+    document.getElementById('timeDisplay').textContent = `⏱ Completed in ${formatTime(elapsedSeconds)}`;
+    document.getElementById('entryForm').classList.remove('hidden');
+    document.getElementById('submittedMsg').classList.add('hidden');
+    document.getElementById('submitError').classList.add('hidden');
+    document.getElementById('entryName').value = '';
+    document.getElementById('entryEmail').value = '';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = false;
+    btn.textContent = 'Submit Entry';
+  }
+
+  function submitEntry() {
+    const name = document.getElementById('entryName').value.trim();
+    const email = document.getElementById('entryEmail').value.trim();
+    if (!name || !email) { alert('Please enter both your name and email.'); return; }
+    if (!email.includes('@')) { alert('Please enter a valid email address.'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    document.getElementById('submitError').classList.add('hidden');
+
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds) })
+    })
+    .then(() => {
+      document.getElementById('entryForm').classList.add('hidden');
+      document.getElementById('submittedMsg').classList.remove('hidden');
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.textContent = 'Submit Entry';
+      document.getElementById('submitError').classList.remove('hidden');
+    });
+  }
+
+  function skipEntry() {
+    document.getElementById('entryForm').classList.add('hidden');
+  }
+
+  function showAdminLogin() {
+    showScreen('adminLogin');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminError').classList.add('hidden');
+  }
+
+  function checkAdmin() {
+    if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+      showScreen('adminDashboard');
+    } else {
+      document.getElementById('adminError').classList.remove('hidden');
+    }
+  }
+
+  function openExplanations() {
+    const body = document.getElementById('modalBody');
+    body.innerHTML = questions.map((q, i) => `
+      <div style="padding:20px 0;border-bottom:1px solid var(--border);${i === questions.length - 1 ? 'border-bottom:none' : ''}">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
+          <span style="font-size:12px;font-weight:700;color:var(--muted);min-width:28px;padding-top:2px;">Q${i + 1}</span>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;">${esc(q.politician)}</div>
+            <div style="font-size:12px;color:var(--muted);">${esc(q.context)}</div>
+          </div>
+          <span style="font-size:11px;font-weight:700;background:var(--real-light);color:var(--real);padding:3px 10px;border-radius:99px;">Clip ${q.realLabel} = Real</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.65;padding-left:38px;">${esc(q.explanation)}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('modalOverlay').classList.remove('hidden');
+    document.getElementById('modalOverlay').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeExplanations() {
+    document.getElementById('modalOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeExplanations();
+  }
+
+  function shareX() {
+    const text = `I scored ${score}/${questions.length} on NewsGuard's Voice Check — can you tell a deepfake from the real thing?`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(QUIZ_URL)}`, '_blank');
+  }
+
+  function shareFacebook() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(QUIZ_URL)}`, '_blank');
+  }
+
+  function shareLinkedIn() {
+    const text = `I scored ${score}/${questions.length} on NewsGuard's Voice Check — can you tell a deepfake from the real thing?`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(QUIZ_URL)}&summary=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function copyLink() {
+    const text = `I scored ${score}/${questions.length} on NewsGuard's Voice Check — can you tell a deepfake from the real thing? ${QUIZ_URL}`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '🔗 Copy Link'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+</script>
+</body>
+</html>
