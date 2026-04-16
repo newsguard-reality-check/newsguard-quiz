@@ -171,15 +171,6 @@
   /* CLIPS */
   .clips-section { padding: 18px 24px 0; display: flex; flex-direction: column; gap: 12px; }
 
-  .clip-divider {
-    text-align: center;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
   .clip-row {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -195,7 +186,6 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
   }
 
   .clip-letter {
@@ -226,40 +216,30 @@
   .clip-verdict-badge.real { background: var(--real); color: white; display: inline-block; }
   .clip-verdict-badge.fake { background: var(--fake); color: white; display: inline-block; }
 
-  .clip-btn-row {
+  .answer-btn-row {
     display: flex;
-    gap: 8px;
-    padding-left: 32px;
+    gap: 10px;
+    padding: 14px 0 4px;
   }
 
   .clip-btn {
     flex: 1;
-    padding: 9px 10px;
+    padding: 11px 10px;
     border-radius: 9px;
     font-family: 'Sora', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
     transition: opacity 0.15s, transform 0.1s, background 0.15s;
+    border: 1.5px solid var(--ng-blue);
+    background: white;
+    color: var(--ng-blue);
   }
+  .clip-btn:hover:not(:disabled) { background: var(--ng-blue); color: white; transform: translateY(-1px); }
   .clip-btn:active { transform: scale(0.97); }
   .clip-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-
-  .clip-btn-real {
-    background: white;
-    color: var(--real);
-    border: 1.5px solid var(--real);
-  }
-  .clip-btn-real:hover:not(:disabled) { background: var(--real); color: white; }
-  .clip-btn-real.selected { background: var(--real); color: white; }
-
-  .clip-btn-fake {
-    background: white;
-    color: var(--fake);
-    border: 1.5px solid var(--fake);
-  }
-  .clip-btn-fake:hover:not(:disabled) { background: var(--fake); color: white; }
-  .clip-btn-fake.selected { background: var(--fake); color: white; }
+  .clip-btn.selected-correct { background: var(--real); border-color: var(--real); color: white; }
+  .clip-btn.selected-wrong   { background: var(--fake); border-color: var(--fake); color: white; }
 
   /* FEEDBACK */
   .feedback {
@@ -466,13 +446,13 @@
         <audio class="clip-audio" controls id="audioA"></audio>
         <span class="clip-verdict-badge" id="badgeA"></span>
       </div>
-      <div class="clip-btn-row">
-        <button class="clip-btn clip-btn-real" id="btnA_real" onclick="handleAnswer('A','real')">✓ This is real</button>
-        <button class="clip-btn clip-btn-fake" id="btnA_fake" onclick="handleAnswer('A','fake')">✗ This is fake</button>
-      </div>
     </div>
 
-    <div class="clip-divider">or</div>
+    <!-- Single answer row -->
+    <div class="answer-btn-row">
+      <button class="clip-btn" id="btnA" onclick="handleAnswer('A')">A is real</button>
+      <button class="clip-btn" id="btnB" onclick="handleAnswer('B')">B is real</button>
+    </div>
 
     <!-- Clip B -->
     <div class="clip-row" id="clipRowB">
@@ -480,10 +460,6 @@
         <span class="clip-letter">B</span>
         <audio class="clip-audio" controls id="audioB"></audio>
         <span class="clip-verdict-badge" id="badgeB"></span>
-      </div>
-      <div class="clip-btn-row">
-        <button class="clip-btn clip-btn-real" id="btnB_real" onclick="handleAnswer('B','real')">✓ This is real</button>
-        <button class="clip-btn clip-btn-fake" id="btnB_fake" onclick="handleAnswer('B','fake')">✗ This is fake</button>
       </div>
     </div>
   </div>
@@ -598,8 +574,6 @@
 
   let current = 0, score = 0;
   let timerInterval = null, elapsedSeconds = 0;
-  // Track whether both clips in a question have been answered
-  let answeredClips = {};
 
   function startTimer() {
     elapsedSeconds = 0;
@@ -644,7 +618,6 @@
   }
 
   function loadQuestion() {
-    answeredClips = { A: false, B: false };
     const q = questions[current];
     const total = questions.length;
 
@@ -660,15 +633,15 @@
 
     ['A', 'B'].forEach(c => {
       document.getElementById(`clipRow${c}`).className = 'clip-row';
-      ['real', 'fake'].forEach(type => {
-        const btn = document.getElementById(`btn${c}_${type}`);
-        btn.disabled = false;
-        btn.className = `clip-btn clip-btn-${type}`;
-      });
       const badge = document.getElementById(`badge${c}`);
       badge.className = 'clip-verdict-badge';
       badge.textContent = '';
     });
+
+    document.getElementById('btnA').disabled = false;
+    document.getElementById('btnB').disabled = false;
+    document.getElementById('btnA').className = 'clip-btn';
+    document.getElementById('btnB').className = 'clip-btn';
 
     document.getElementById('feedback').className = 'feedback';
     document.getElementById('nextBtn').className = 'next-btn';
@@ -678,56 +651,46 @@
     card.style.animation = 'fadeUp 0.35s cubic-bezier(.4,0,.2,1)';
   }
 
-  function handleAnswer(clip, choice) {
-    if (answeredClips[clip]) return;
-    answeredClips[clip] = true;
-
+  function handleAnswer(chosenClip) {
     const q = questions[current];
-    const clipObj = clip === 'A' ? q.clipA : q.clipB;
-    const isCorrect = (clipObj.isReal === (choice === 'real'));
+    const correct = (chosenClip === q.realLabel);
+    if (correct) score++;
 
-    // Style the selected button
-    const selectedBtn = document.getElementById(`btn${clip}_${choice}`);
-    selectedBtn.classList.add('selected');
+    // Disable both buttons
+    document.getElementById('btnA').disabled = true;
+    document.getElementById('btnB').disabled = true;
 
-    // Disable both buttons for this clip
-    document.getElementById(`btn${clip}_real`).disabled = true;
-    document.getElementById(`btn${clip}_fake`).disabled = true;
+    // Style the chosen button
+    const chosenBtn = document.getElementById(`btn${chosenClip}`);
+    chosenBtn.className = `clip-btn ${correct ? 'selected-correct' : 'selected-wrong'}`;
 
-    // Show badge on the clip row
-    const row = document.getElementById(`clipRow${clip}`);
-    const badge = document.getElementById(`badge${clip}`);
-    if (clipObj.isReal) {
-      row.classList.add('reveal-real');
-      badge.textContent = 'Real';
-      badge.className = 'clip-verdict-badge real';
-    } else {
-      row.classList.add('reveal-fake');
-      badge.textContent = 'Fake';
-      badge.className = 'clip-verdict-badge fake';
-    }
+    // Reveal badges on both clip rows
+    ['A', 'B'].forEach(c => {
+      const clipObj = c === 'A' ? q.clipA : q.clipB;
+      const row = document.getElementById(`clipRow${c}`);
+      const badge = document.getElementById(`badge${c}`);
+      if (clipObj.isReal) {
+        row.classList.add('reveal-real');
+        badge.textContent = 'Real';
+        badge.className = 'clip-verdict-badge real';
+      } else {
+        row.classList.add('reveal-fake');
+        badge.textContent = 'Fake';
+        badge.className = 'clip-verdict-badge fake';
+      }
+    });
 
-    // Check if both clips answered
-    if (answeredClips.A && answeredClips.B) {
-      // Score: award 1 point if both clips labelled correctly
-      const aCorrect = (questions[current].clipA.isReal === (document.getElementById('btnA_real').classList.contains('selected')));
-      const bCorrect = (questions[current].clipB.isReal === (document.getElementById('btnB_real').classList.contains('selected')));
-      const bothCorrect = aCorrect && bCorrect;
-      if (bothCorrect) score++;
+    document.getElementById('scoreLabel').textContent = `${score} correct`;
 
-      document.getElementById('scoreLabel').textContent = `${score} correct`;
+    const feedback = document.getElementById('feedback');
+    document.getElementById('feedbackVerdict').textContent = correct
+      ? `✓ Correct — Clip ${q.realLabel} was the real recording`
+      : `✗ Not quite — Clip ${q.realLabel} was the real recording`;
+    feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
 
-      const feedback = document.getElementById('feedback');
-      document.getElementById('feedbackVerdict').textContent = bothCorrect
-        ? `✓ Correct — Clip ${q.realLabel} was the real recording`
-        : `✗ Not quite — Clip ${q.realLabel} was the real recording`;
-      document.getElementById('feedbackText').textContent = '';
-      feedback.className = `feedback ${bothCorrect ? 'correct' : 'incorrect'}`;
-
-      const nextBtn = document.getElementById('nextBtn');
-      nextBtn.textContent = current < questions.length - 1 ? 'Next Question →' : 'See My Results →';
-      nextBtn.className = 'next-btn visible';
-    }
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = current < questions.length - 1 ? 'Next Question →' : 'See My Results →';
+    nextBtn.className = 'next-btn visible';
   }
 
   function nextQuestion() {
