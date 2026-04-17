@@ -771,7 +771,7 @@
   }
 
   function shareX() {
-    const text = `I scored ${score}/${questions.length} on NewsGuard's Voice Check — can you tell a deepfake from the real thing?`;
+    const text = `I scored ${score}/5 on NewsGuard's Fake-or-Not Quiz — can you tell a deepfake from the real thing?`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(QUIZ_URL)}`, '_blank');
   }
 
@@ -780,13 +780,12 @@
   }
 
   function shareLinkedIn() {
-    const text = `I scored ${score}/${questions.length} on NewsGuard's Voice Check — can you tell a deepfake from the real thing?`;
+    const text = `I scored ${score}/5 on NewsGuard's Fake-or-Not Quiz — can you tell a deepfake from the real thing?`;
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(QUIZ_URL)}&summary=${encodeURIComponent(text)}`, '_blank');
   }
 
   function copyLink() {
-    const text = `I scored ${score}/${questions.length} on NewsGuard's Voice Check — can you tell a deepfake from the real thing? ${QUIZ_URL}`;
-    navigator.clipboard.writeText(text).then(() => {
+    navigator.clipboard.writeText(QUIZ_URL).then(() => {
       const btn = document.getElementById('copyBtn');
       btn.textContent = '✓ Copied!';
       btn.classList.add('copied');
