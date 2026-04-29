@@ -653,7 +653,7 @@
       explanation: "This post is fabricated. It does not appear in any archive of Trump's Truth Social account."
     },
     {
-      file: "post-05.jpeg",
+      file: "post-05.png",
       claim: "This Truth Social post is from President Donald Trump.",
       answer: "Fake",
       explanation: "This post is fabricated. It does not appear in any archive of Trump's Truth Social account and contains formatting inconsistencies not present in genuine posts."
@@ -745,7 +745,6 @@
 
     const mediaWrap = document.getElementById('mediaWrap');
     mediaWrap.innerHTML = `
-      <div class="media-type-label"><span class="dot"></span>Screenshot</div>
       <img src="${IMAGE_BASE_URL}${q.file}" alt="Truth Social post screenshot" />`;
 
     document.getElementById('claimText').textContent = q.claim;
