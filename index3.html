@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NewsGuard Reality Check — Truth Social Edition</title>
+<title>NewsGuard Reality Check — Trump's Truth Social</title>
+<meta property="og:title" content="NewsGuard Reality Check — Trump's Truth Social">
+<meta property="og:description" content="Can you spot a fake Trump Truth Social post from a real one?">
+<meta name="twitter:title" content="NewsGuard Reality Check — Trump's Truth Social">
+<meta name="twitter:description" content="Can you spot a fake Trump Truth Social post from a real one?">
 <link rel="icon" type="image/png" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -538,10 +542,7 @@
       <div class="tip-icon">🔗</div>
       <div class="tip-text"><strong>Go to the source.</strong> Search for the post on the actual platform. For Trump's Truth Social posts, you can use <a href="https://trumpstruth.org" target="_blank" style="color:var(--ng-blue);">trumpstruth.org</a> — an archive of every post he has made.</div>
     </div>
-    <div class="tip-item">
-      <div class="tip-icon">🖋️</div>
-      <div class="tip-text"><strong>Check the writing style.</strong> Does the language, tone, and phrasing match what the account typically posts? Unusual formality, spelling, or vocabulary are red flags.</div>
-    </div>
+
     <div class="tip-item">
       <div class="tip-icon">🔡</div>
       <div class="tip-text"><strong>Look for font and formatting inconsistencies.</strong> Fake screenshots often have subtle differences in font weight, spacing, or button layout compared to genuine posts.</div>
@@ -870,24 +871,24 @@
   }
 
   function shareX() {
-    const text = `I scored ${score}/10 on NewsGuard's Truth Social Reality Check — can you spot a fake post from a real one?`;
-    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/';
+    const text = `I scored ${score}/10 on NewsGuard's Reality Check quiz — can you spot a fake Trump Truth Social post from a real one?`;
+    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/index3.html';
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
   }
 
   function shareFacebook() {
-    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/';
+    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/index3.html';
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
   }
 
   function shareLinkedIn() {
-    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/';
-    const text = `I scored ${score}/10 on NewsGuard's Truth Social Reality Check — can you spot a fake post from a real one?`;
+    const url = 'https://newsguard-reality-check.github.io/newsguard-quiz/index3.html';
+    const text = `I scored ${score}/10 on NewsGuard's Reality Check quiz — can you spot a fake Trump Truth Social post from a real one?`;
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&summary=${encodeURIComponent(text)}`, '_blank');
   }
 
   function copyLink() {
-    const text = `I scored ${score}/10 on NewsGuard's Truth Social Reality Check — can you spot a fake post from a real one? https://newsguard-reality-check.github.io/newsguard-quiz/`;
+    const text = `I scored ${score}/10 on NewsGuard's Reality Check quiz — can you spot a fake Trump Truth Social post from a real one? https://newsguard-reality-check.github.io/newsguard-quiz/index3.html`;
     navigator.clipboard.writeText(text).then(() => {
       const btn = document.getElementById('copyBtn');
       btn.textContent = '✓ Copied!';
