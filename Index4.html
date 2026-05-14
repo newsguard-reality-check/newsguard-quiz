@@ -166,8 +166,11 @@
     animation: fadeUp 0.25s ease;
   }
 
-  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
-  .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; display: block; }
+  .feedback.correct,
+  .feedback.incorrect { display: block; }
+
+  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; }
+  .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; }
   .feedback-verdict { font-weight: 700; font-size: 15px; }
 
   .next-btn {
@@ -613,10 +616,12 @@
     const mediaWrap = document.getElementById('mediaWrap');
     mediaWrap.innerHTML = `<img src="${IMAGE_BASE_URL}${q.file}" alt="Article screenshot" />`;
 
-    document.getElementById('claimText').textContent = q.claim;
     document.getElementById('btnReal').disabled = false;
     document.getElementById('btnFake').disabled = false;
-    document.getElementById('feedback').className = 'feedback';
+    const fb = document.getElementById('feedback');
+    fb.className = 'feedback';
+    fb.style.display = 'none';
+    document.getElementById('feedbackVerdict').textContent = '';
     document.getElementById('nextBtn').classList.remove('visible');
 
     const card = document.getElementById('questionCard');
