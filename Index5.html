@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsGuard Reality Check — Quiz 5: Can You Spot the Satire?</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ng-blue: #3355dd;
+    --ng-blue-dark: #1e3ab8;
+    --ng-blue-light: #eef1fd;
+    --real: #16a34a;
+    --real-light: #dcfce7;
+    --satire: #9333ea;
+    --satire-light: #f3e8ff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(51,85,221,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 64px 0;
+  }
+
+  .header {
+    width: 100%;
+    background: var(--white);
+    border-bottom: 2px solid var(--ng-blue);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(51,85,221,0.07);
+  }
+
+  .ng-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+
+  .header-titles { display: flex; flex-direction: column; }
+  .header-title { font-size: 15px; font-weight: 700; color: var(--ng-blue); }
+  .header-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+  .header-timer {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ng-blue);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    background: var(--ng-blue-light);
+    padding: 6px 14px;
+    border-radius: 99px;
+    display: none;
+  }
+  .header-timer.visible { display: block; }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 680px;
+    padding: 20px 24px 0;
+    display: none;
+  }
+  .progress-bar-wrap.visible { display: block; }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .progress-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--ng-blue); border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 20px 24px 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    display: none;
+  }
+  .card.visible { display: block; animation: fadeUp 0.35s cubic-bezier(.4,0,.2,1); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .claim-section { padding: 28px 24px 0; }
+
+  .claim-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--ng-blue);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .claim-text {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .btn-row { display: flex; gap: 12px; padding: 24px 24px 28px; }
+
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 14px 0;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.13); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-real { background: var(--real); color: white; }
+  .btn-satire { background: #dc2626; color: white; }
+
+  .feedback {
+    margin: 0 24px 0;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
+  .feedback.incorrect { background: #fee2e2; border-left: 4px solid #dc2626; color: #7f1d1d; display: block; }
+  .feedback-verdict { font-weight: 700; font-size: 15px; }
+
+  .next-btn {
+    display: none;
+    width: calc(100% - 48px);
+    margin: 16px 24px 28px;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+  .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+  .next-btn.visible { display: block; }
+
+  .screen {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+    margin: 24px 24px 0;
+    display: none;
+  }
+  .screen.visible { display: block; }
+
+  .screen h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+  .screen h1 span { color: var(--ng-blue); }
+  .screen > p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 480px; margin: 0 auto 24px; }
+
+  .primary-btn {
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+
+  /* REGISTRATION SCREEN */
+  .reg-form { text-align: left; max-width: 400px; margin: 0 auto; }
+  .reg-form h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; text-align: center; }
+  .reg-form .reg-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; text-align: center; line-height: 1.5; }
+  .form-field { margin-bottom: 14px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    background: white;
+  }
+  .form-field input:focus { border-color: var(--ng-blue); box-shadow: 0 0 0 3px var(--ng-blue-light); }
+  .form-field input.error { border-color: #dc2626; }
+
+  .reg-submit {
+    width: 100%;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.15s;
+  }
+  .reg-submit:hover { background: var(--ng-blue-dark); }
+
+  .reg-error { font-size: 13px; color: #dc2626; margin-top: 10px; text-align: center; display: none; }
+  .reg-error.visible { display: block; }
+
+  /* SCORE SCREEN */
+  .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  .score-badge {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--ng-blue);
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(51,85,221,0.25);
+  }
+
+  .score-tier {
+    font-size: 14px;
+    color: var(--ng-blue);
+    font-weight: 600;
+    background: var(--ng-blue-light);
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
+
+  .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
+
+  .score-actions { margin-bottom: 24px; }
+
+  /* TIPS — emoji style like Index4 */
+  .tips-section {
+    text-align: left;
+    margin-top: 28px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+  }
+
+  .tips-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ng-blue);
+    margin-bottom: 14px;
+  }
+
+  .tip-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .tip-icon {
+    font-size: 20px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .tip-content { flex: 1; }
+  .tip-head { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .tip-text { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  .about-allod {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 8px 0 20px;
+    text-align: left;
+  }
+  .about-allod-title { font-weight: 700; color: var(--text); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
+  .about-allod p { font-size: 13px; color: var(--muted); line-height: 1.65; margin: 0; }
+
+  .academy-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    margin-top: 10px;
+  }
+  .academy-link:hover { border-color: var(--ng-blue); box-shadow: 0 0 0 3px var(--ng-blue-light); }
+  .academy-link-icon { font-size: 18px; flex-shrink: 0; color: var(--ng-blue); }
+  .academy-link-text { flex: 1; }
+  .academy-link-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ng-blue); margin-bottom: 2px; }
+  .academy-link-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
+  .academy-link-arrow { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+
+  .submitted-msg { text-align: center; padding: 14px 18px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; display: none; }
+  .submitted-msg.visible { display: block; }
+  .share-section { margin-top: 28px; border-top: 1px solid var(--border); padding-top: 24px; text-align: center; }
+  .share-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ng-blue); margin-bottom: 10px; }
+  .share-sub { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 440px; margin: 0 auto 18px; }
+  .share-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .share-btn { display: flex; align-items: center; gap: 7px; border: none; border-radius: 9px; font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 16px; cursor: pointer; transition: opacity 0.15s, transform 0.12s; color: white; }
+  .share-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .share-btn.x-btn    { background: #000; }
+  .share-btn.fb-btn   { background: #1877f2; }
+  .share-btn.li-btn   { background: #0a66c2; }
+  .share-btn.copy-btn { background: var(--muted); }
+  .share-btn.copy-btn.copied { background: var(--real); }
+
+  .submitted-msg { text-align: center; padding: 14px 18px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; display: none; }
+  .submitted-msg.visible { display: block; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+  .modal-overlay.visible { display: flex; }
+
+  .modal { background: var(--white); border-radius: 20px 20px 0 0; width: 100%; max-width: 680px; max-height: 85vh; overflow-y: auto; padding: 0 0 40px 0; animation: slideUp 0.3s cubic-bezier(.4,0,.2,1); box-shadow: 0 -8px 40px rgba(0,0,0,0.18); }
+
+  @keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-header { position: sticky; top: 0; background: var(--white); border-bottom: 1px solid var(--border); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
+  .modal-title { font-size: 17px; font-weight: 800; color: var(--text); }
+  .modal-close { background: var(--bg); border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 18px; cursor: pointer; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .modal-close:hover { background: var(--border); }
+  .modal-body { padding: 8px 24px 0; }
+
+  .allod-outro { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 20px; font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .allod-outro strong { color: var(--text); }
+
+  .explanation-item { padding: 20px 0; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; }
+  .explanation-item:last-child { border-bottom: none; }
+
+  .exp-num-badge { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--ng-blue-light); color: var(--ng-blue); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+
+  .exp-content { flex: 1; min-width: 0; }
+  .exp-header { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+  .exp-claim { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; line-height: 1.4; }
+
+  .verdict-pill { font-size: 11px; font-weight: 800; letter-spacing: 0.5px; padding: 3px 9px; border-radius: 99px; flex-shrink: 0; text-transform: uppercase; white-space: nowrap; }
+  .verdict-real { background: var(--real-light); color: var(--real); }
+  .verdict-satire { background: var(--satire-light); color: var(--satire); }
+
+  .exp-text { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  .skip-link { display: block; text-align: center; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; margin-top: 10px; }
+  .skip-link:hover { color: var(--ng-blue); }
+
+  /* ADMIN */
+  .admin-input { width: 100%; max-width: 280px; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-family: 'Sora', sans-serif; font-size: 15px; margin: 16px 0 10px; outline: none; text-align: center; letter-spacing: 2px; background: white; }
+  .admin-input:focus { border-color: var(--ng-blue); }
+  .admin-error { color: #dc2626; font-size: 13px; margin-top: 10px; display: none; }
+  .admin-error.visible { display: block; }
+
+  @media (max-width: 600px) {
+    .card, .screen, .progress-bar-wrap { margin-left: 12px; margin-right: 12px; }
+    .claim-text { font-size: 16px; }
+    .btn { font-size: 14px; padding: 12px 0; }
+    .screen { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="ng-badge"><img src="https://newsguard-reality-check.github.io/newsguard-quiz/favicon.png" alt="NewsGuard" style="width:28px;height:28px;display:block;" /></div>
+  <div class="header-titles">
+    <div class="header-title">NewsGuard Reality Check</div>
+    <div class="header-sub">Fake-or-Not: Can You Spot the Satire?</div>
+  </div>
+  <div class="header-timer" id="headerTimer">0:00</div>
+</div>
+
+<!-- START SCREEN -->
+<div class="screen visible" id="startScreen">
+  <h1>Can you spot the <span>satire</span>?</h1>
+  <p>A satirical Facebook page called America's Last Line of Defense is duping conservatives through fake news stories. Can you spot a satire claim from real news?<br><br>Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap.</p>
+  <div class="reg-form" style="margin-top:4px;">
+    <div class="form-field">
+      <label>Full Name</label>
+      <input type="text" id="regName" placeholder="Your name" autocomplete="name" />
+    </div>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitReg()" />
+    </div>
+    <button class="reg-submit" onclick="submitReg()">Start Quiz →</button>
+    <div class="reg-error" id="regError">Please enter your name and a valid email address.</div>
+  </div>
+  <div class="start-meta" style="margin-top:14px;">10 questions · Timer starts when you begin</div>
+  <br>
+  <a class="skip-link" onclick="showAdminLogin()">Admin access</a>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap" id="progressWrap">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 of 10</span>
+    <span id="scoreLabel">0 correct</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="card" id="questionCard">
+  <div class="claim-section">
+    <div class="claim-label">Claim</div>
+    <div class="claim-text" id="claimText"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-real" id="btnReal" onclick="answer('Real')">✓ Real</button>
+    <button class="btn btn-satire" id="btnSatire" onclick="answer('Satire')">✗ Satire</button>
+  </div>
+  <div class="feedback" id="feedback">
+    <div class="feedback-verdict" id="feedbackVerdict"></div>
+  </div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+</div>
+
+<!-- SCORE SCREEN -->
+<div class="screen" id="scoreScreen">
+  <div class="score-badge" id="scoreBadge"></div>
+  <h1 id="scoreTitle"></h1>
+  <div class="score-tier" id="scoreTier"></div>
+  <div class="time-display" id="timeDisplay"></div>
+  <p id="scoreDesc"></p>
+
+  <div class="submitted-msg visible" id="autoEnteredMsg" style="margin-bottom:0;">&#10003; Your result has been recorded. We'll contact you if you win.</div>
+
+  <button class="primary-btn" onclick="openExplanations()" style="margin-top:20px;">See Full Explanations &#8594;</button>
+
+  <div class="about-allod" style="margin-top:24px;">
+    <div class="about-allod-title">About America's Last Line of Defense</div>
+    <p>While individual posts published by America's Last Line of Defense are not labeled as satire, the Facebook page states in its "Intro" section that it is part of a "network of trollery and propaganda for cash. Nothing on this page is real." However, many of the claims that originate on this page spread on other accounts that do not label the claims as satire.</p>
+  </div>
+
+  <div class="tips-section">
+    <div class="tips-title">Tips for identifying satire</div>
+
+    <div class="tip-item">
+      <div class="tip-icon">🔍</div>
+      <div class="tip-content">
+        <div class="tip-head">Look for the watermark</div>
+        <div class="tip-text">Many ALLOD satire claims spread through graphics that have a small watermark in the bottom left corner labeling them as satire. If you see that watermark on an image, it originated from ALLOD.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🗞️</div>
+      <div class="tip-content">
+        <div class="tip-head">Search for the claim in reliable sources</div>
+        <div class="tip-text">Do a quick Google search and see if the story has been reported by established news outlets. If you're only seeing Facebook and X links, that's a bad sign — real news gets covered by real newsrooms.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🎭</div>
+      <div class="tip-content">
+        <div class="tip-head">Check the source's "About" section</div>
+        <div class="tip-text">Satire pages like ALLOD often disclose their nature in an "About" or "Intro" section most readers never see. A quick check of the page's bio can reveal that "nothing on this page is real."</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🤔</div>
+      <div class="tip-content">
+        <div class="tip-head">Be skeptical of stories that confirm your suspicions</div>
+        <div class="tip-text">Satire often leans into absurdity — extreme dollar amounts, implausible scenarios, or claims that perfectly confirm partisan assumptions. If a headline makes you feel instantly vindicated, it warrants extra scrutiny.</div>
+      </div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">📅</div>
+      <div class="tip-content">
+        <div class="tip-head">Check the date</div>
+        <div class="tip-text">Some satire stories resurface years after their original publication, stripped of context. A story about a politician doing something outrageous may have originated as a joke long ago and been reshared as if current.</div>
+      </div>
+    </div>
+
+    <a class="academy-link" href="https://www.newsguardrealitycheck.com/p/how-to-spot-a-satirical-claim" target="_blank" rel="noopener">
+      <div class="academy-link-icon">&#9654;</div>
+      <div class="academy-link-text">
+        <div class="academy-link-label">NewsGuard Academy</div>
+        <div class="academy-link-title">How to Spot a Satirical Claim</div>
+      </div>
+      <div class="academy-link-arrow">&#8594;</div>
+    </a>
+    <a class="academy-link" href="https://www.newsguardrealitycheck.com/p/reality-check-commentary-the-satire" target="_blank" rel="noopener">
+      <div class="academy-link-icon">&#9997;&#65039;</div>
+      <div class="academy-link-text">
+        <div class="academy-link-label">NewsGuard Commentary</div>
+        <div class="academy-link-title">The Satire Trap — by Editorial Director Eric Effron</div>
+      </div>
+      <div class="academy-link-arrow">&#8594;</div>
+    </a>
+  </div>
+
+  <div class="share-section">
+    <div class="share-label">Share this quiz with your friends!</div>
+    <p class="share-sub">Please forward this quiz to friends or family members to show them how hard it is to spot satire — and why they might want to question what they see on social media.</p>
+    <div class="share-buttons">
+      <button class="share-btn x-btn" onclick="shareX()">&#120143; X</button>
+      <button class="share-btn fb-btn" onclick="shareFacebook()">f Facebook</button>
+      <button class="share-btn li-btn" onclick="shareLinkedIn()">in LinkedIn</button>
+      <button class="share-btn copy-btn" id="copyBtn" onclick="copyLink()">&#128279; Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="screen" id="adminLogin">
+  <h1>Admin <span>Access</span></h1>
+  <p>Enter the password to access the leaderboard.</p>
+  <input class="admin-input" type="password" id="adminPassword" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
+  <br>
+  <button class="primary-btn" onclick="checkAdmin()">Enter</button>
+  <div class="admin-error" id="adminError">Incorrect password. Try again.</div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="screen" id="adminDashboard">
+  <h1>🏆 <span>Leaderboard</span></h1>
+  <p>All entries are saved to your Google Sheet in real time.</p>
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn">Open Google Sheets →</a>
+  <br><br>
+  <div style="font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin:0 auto;">
+    To find the winner: sort column D (Score) descending, then column E (Time in seconds) ascending.
+  </div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- EXPLANATIONS MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title">Full Explanations</div>
+      <button class="modal-close" onclick="closeExplanations()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  var SHEET_URL = "https://script.google.com/macros/s/AKfycbwz7j5vGV58qojLu7bJ3rP70ZMjhYHluFPsRbJDCSuYBWxF_xxV4XlgYPRIATW7s88RTA/exec";
+  var ADMIN_PASSWORD = "NewsGuard25";
+  var QUIZ_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/quiz5/";
+
+  var questions = [
+    {
+      claim: "Federal auditors are investigating Rep. Alexandria Ocasio-Cortez for having a net worth of $22 million",
+      answer: "Satire",
+      explanation: "This is a fabrication from America's Last Line of Defense (ALLOD). No such federal investigation exists. AOC's publicly filed financial disclosures show a net worth far below $22 million. ALLOD graphics like this often carry a small 'satire' watermark in the corner that gets cropped out when reshared."
+    },
+    {
+      claim: "Governor Gavin Newsom requested $33,000 in taxpayer money for an official State Capitol portrait of himself",
+      answer: "Real",
+      explanation: "This is real. California Gov. Gavin Newsom's administration did request $33,000 in state funds for an official Capitol portrait, a standard practice for governors, though the price tag attracted significant criticism and media attention in 2024."
+    },
+    {
+      claim: "42 percent of Democrats think Trump staged his Butler, Pennsylvania, rally assassination attempt",
+      answer: "Real",
+      explanation: "This is real. A May 2026 NewsGuard/YouGov poll found that 42% of Democrats believed the assassination attempt on President Donald Trump at his Butler, Pennsylvania, rally was staged."
+    },
+    {
+      claim: "Mayor Zohran Mamdani is directing New York City to buy a defunct grocery store owned by his cousin for $230 million",
+      answer: "Satire",
+      explanation: "This is a fabrication from ALLOD. No such purchase has occurred. The claim appears designed to stoke suspicions about Mamdani, a democratic socialist elected mayor of New York City in 2025."
+    },
+    {
+      claim: "Charlie Kirk's widow sued ABC and its show 'The View' for 'vile smears' about her assassinated husband",
+      answer: "Satire",
+      explanation: "This is fabricated by ALLOD. While Charlie Kirk was assassinated, his widow has not filed any such lawsuit against ABC or The View. The claim is a fictional legal scenario invented to generate outrage."
+    },
+    {
+      claim: "Federal officials are investigating Rep. Ilhan Omar for immigration fraud for allegedly marrying her brother",
+      answer: "Real",
+      explanation: "This is real. Federal immigration fraud allegations against Rep. Ilhan Omar — centered on claims she married her brother Ahmed Nur Said Elmi to facilitate his immigration — have been the subject of genuine government inquiries and extensive media reporting since 2016. Rep. Omar has denied the allegations."
+    },
+    {
+      claim: "Nicki Minaj credits Gavin Newsom for tilting her toward Trump after the governor 'completely ignored' her pleas for help",
+      answer: "Real",
+      explanation: "This is real. Nicki Minaj publicly stated that Gov. Gavin Newsom's failure to respond to her requests for assistance — related to a legal matter involving her husband — was a factor in her eventual public support for Donald Trump in the 2024 election."
+    },
+    {
+      claim: "FEMA transferred $2 billion from immigrant aid to North Carolina disaster relief under Donald Trump",
+      answer: "Satire",
+      explanation: "This is a fabrication from ALLOD. While the Trump administration made real changes to FEMA funding priorities, the specific claim of a $2 billion transfer from 'immigrant aid' to North Carolina disaster relief is fictional. ALLOD crafted this story to blend real political tensions with invented specifics."
+    },
+    {
+      claim: "The official X account for the Democratic Party called Stephen Miller 'ugly' in a profanity-laced post",
+      answer: "Real",
+      explanation: "This is real. On May 27, 2026, the official @TheDemocrats account posted in a reply to White House Deputy Chief of Staff for Policy Stephen Miller. After Miller posted an attack on Texas Senate candidate James Talarico, the Democrats account stated, \"shut up you ugly f\u2014\""
+    },
+    {
+      claim: "Sen. Amy Klobuchar has become the fourth wealthiest woman in the U.S. since joining Congress in 2007",
+      answer: "Satire",
+      explanation: "This is a fabrication from ALLOD. Sen. Klobuchar's publicly available financial disclosures show a net worth in the low millions — nowhere near the billions that would place her among the wealthiest women in the U.S. The fourth wealthiest woman in America has a net worth in the tens of billions."
+    }
+  ];
+
+  var current = 0, score = 0, answered = false;
+  var timerInterval = null, elapsedSeconds = 0;
+  var playerName = '', playerEmail = '';
+
+  function submitReg() {
+    var name = document.getElementById('regName').value.trim();
+    var email = document.getElementById('regEmail').value.trim();
+    var err = document.getElementById('regError');
+    if (!name || !email || !email.includes('@')) {
+      err.classList.add('visible');
+      return;
+    }
+    err.classList.remove('visible');
+    playerName = name;
+    playerEmail = email;
+    startQuiz();
+  }
+
+  function startTimer() {
+    elapsedSeconds = 0;
+    clearInterval(timerInterval);
+    document.getElementById('headerTimer').classList.add('visible');
+    timerInterval = setInterval(function() {
+      elapsedSeconds++;
+      document.getElementById('headerTimer').textContent = formatTime(elapsedSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() { clearInterval(timerInterval); }
+
+  function formatTime(s) {
+    return Math.floor(s/60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function showScreen(id) {
+    var allScreens = ['startScreen','scoreScreen','adminLogin','adminDashboard'];
+    allScreens.forEach(function(s) {
+      var el = document.getElementById(s);
+      if (el) el.classList.remove('visible');
+    });
+    document.getElementById('progressWrap').classList.remove('visible');
+    document.getElementById('questionCard').classList.remove('visible');
+    var target = document.getElementById(id);
+    if (target) target.classList.add('visible');
+  }
+
+  function startQuiz() {
+    current = 0; score = 0; answered = false;
+    showScreen('__none__');
+    document.getElementById('progressWrap').classList.add('visible');
+    document.getElementById('questionCard').classList.add('visible');
+    startTimer();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    answered = false;
+    var q = questions[current];
+
+    document.getElementById('progressLabel').textContent = 'Question ' + (current + 1) + ' of ' + questions.length;
+    document.getElementById('scoreLabel').textContent = score + ' correct';
+    document.getElementById('progressFill').style.width = ((current / questions.length) * 100) + '%';
+    document.getElementById('claimText').textContent = q.claim;
+    document.getElementById('btnReal').disabled = false;
+    document.getElementById('btnSatire').disabled = false;
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('feedbackVerdict').textContent = '';
+    document.getElementById('nextBtn').classList.remove('visible');
+
+    var card = document.getElementById('questionCard');
+    card.classList.remove('visible');
+    void card.offsetWidth;
+    card.classList.add('visible');
+  }
+
+  function answer(choice) {
+    if (answered) return;
+    answered = true;
+    var q = questions[current];
+    var correct = (choice === q.answer);
+    if (correct) score++;
+
+    document.getElementById('btnReal').disabled = true;
+    document.getElementById('btnSatire').disabled = true;
+
+    var verdict = document.getElementById('feedbackVerdict');
+    var feedback = document.getElementById('feedback');
+
+    if (correct) {
+      verdict.textContent = '\u2713 Correct \u2014 This claim is ' + q.answer;
+      feedback.className = 'feedback correct';
+    } else {
+      verdict.textContent = '\u2717 Incorrect \u2014 This claim is actually ' + q.answer;
+      feedback.className = 'feedback incorrect';
+    }
+
+    var nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = current < questions.length - 1 ? 'Next Question \u2192' : 'See My Results \u2192';
+    nextBtn.classList.add('visible');
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) showScore();
+    else loadQuestion();
+  }
+
+  function showScore() {
+    stopTimer();
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('headerTimer').classList.remove('visible');
+    document.getElementById('progressWrap').classList.remove('visible');
+    document.getElementById('questionCard').classList.remove('visible');
+    document.getElementById('scoreScreen').classList.add('visible');
+
+    var pct = score / questions.length;
+    var tier, desc;
+    if (pct === 1)       { tier = "Misinformation Expert";         desc = "Perfect score. You identified every claim correctly. Your eye for satire \u2014 and for real reporting \u2014 is sharp."; }
+    else if (pct >= 0.8) { tier = "Highly Discerning Reader";      desc = "You caught most of the satire. A few slipped by, but your instincts are strong."; }
+    else if (pct >= 0.6) { tier = "Informed but Vulnerable";       desc = "You identified many claims correctly, but some satire got through. Keep questioning what you see online."; }
+    else if (pct >= 0.4) { tier = "Susceptible to Misinformation"; desc = "Several fake claims fooled you. Satirical content is increasingly sophisticated \u2014 always verify before sharing."; }
+    else                 { tier = "High Risk Reader";               desc = "Most satirical claims got through. The tips below will help you spot ALLOD-style satire in the future."; }
+
+    document.getElementById('scoreBadge').textContent = score + '/10';
+    document.getElementById('scoreTitle').textContent = score === 10 ? "Perfect Score!" : score >= 7 ? "Well Done!" : score >= 5 ? "Not Bad!" : "Keep Practicing";
+    document.getElementById('scoreTier').textContent = tier;
+    document.getElementById('scoreDesc').textContent = desc;
+    document.getElementById('timeDisplay').textContent = '\u23f1 Completed in ' + formatTime(elapsedSeconds);
+
+    submitToSheet();
+  }
+
+  function submitToSheet() {
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quiz: 'Quiz5-Satire', name: playerName, email: playerEmail, score: score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds) })
+    }).catch(function() {});
+  }
+
+  function showAdminLogin() {
+    showScreen('adminLogin');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminError').classList.remove('visible');
+  }
+
+  function checkAdmin() {
+    if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+      showScreen('adminDashboard');
+    } else {
+      document.getElementById('adminError').classList.add('visible');
+    }
+  }
+
+  function openExplanations() {
+    var body = document.getElementById('modalBody');
+    var items = questions.map(function(q, i) {
+      var verdictClass = q.answer === 'Real' ? 'verdict-real' : 'verdict-satire';
+      return '<div class="explanation-item">' +
+        '<div class="exp-num-badge">Q' + (i + 1) + '</div>' +
+        '<div class="exp-content">' +
+          '<div class="exp-header">' +
+            '<div class="exp-claim">' + esc(q.claim) + '</div>' +
+            '<div class="verdict-pill ' + verdictClass + '">' + q.answer + '</div>' +
+          '</div>' +
+          '<div class="exp-text">' + esc(q.explanation) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    body.innerHTML = items;
+    document.getElementById('modalOverlay').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeExplanations() {
+    document.getElementById('modalOverlay').classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeExplanations();
+  }
+
+  function shareX() {
+    var text = 'I scored ' + score + '/10 on NewsGuard\'s Fake-or-Not quiz \u2014 can you spot satire from real news? https://newsguard-reality-check.github.io/newsguard-quiz/quiz5/';
+    window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(QUIZ_URL), '_blank');
+  }
+
+  function shareFacebook() {
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(QUIZ_URL), '_blank');
+  }
+
+  function shareLinkedIn() {
+    var text = 'I scored ' + score + '/10 on NewsGuard\'s Fake-or-Not quiz \u2014 can you spot satire from real news? https://newsguard-reality-check.github.io/newsguard-quiz/quiz5/';
+    window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(QUIZ_URL) + '&summary=' + encodeURIComponent(text), '_blank');
+  }
+
+  function copyLink() {
+    var text = 'I scored ' + score + '/10 on NewsGuard\'s Fake-or-Not quiz \u2014 can you spot satire from real news? https://newsguard-reality-check.github.io/newsguard-quiz/quiz5/';
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('copyBtn');
+      btn.textContent = '\u2713 Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = '\ud83d\udd17 Copy Link'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+
+  function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
