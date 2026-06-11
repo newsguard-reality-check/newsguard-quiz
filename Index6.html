@@ -746,7 +746,7 @@
     document.getElementById('progressFill').style.width = ((current / questions.length) * 100) + '%';
 
     var mw = document.getElementById('mediaWrap');
-    mw.innerHTML = '<span class="media-type-label">Screenshot</span><img src="' + IMAGE_BASE + q.file + '" alt="Screenshot for question ' + (current + 1) + '" />';
+    mw.innerHTML = '<img src="' + IMAGE_BASE + q.file + '" alt="Screenshot for question ' + (current + 1) + '" />';
 
     document.getElementById('claimText').textContent = q.claim;
     document.getElementById('btnReal').disabled = false;
