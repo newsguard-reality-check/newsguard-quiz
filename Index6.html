@@ -809,7 +809,7 @@
     else                 { tier = "Susceptible to Brand Fakes";     desc = "Several fabricated claims fooled you. Brand misinformation is sophisticated \u2014 always verify screenshots before sharing."; }
 
     document.getElementById('scoreBadge').textContent = score + '/8';
-    document.getElementById('scoreTitle').textContent = score === 8 ? "Perfect Score!" : score >= 6 ? "Well Done!" : score >= 4 ? "Not Bad!" : "Keep Practicing";
+    document.getElementById('scoreTitle').textContent = score === 8 ? "Perfect Score!" : score >= 6 ? "Well Done!" : score >= 4 ? "Room to Improve" : "Keep Practicing";
     document.getElementById('scoreTier').textContent = tier;
     document.getElementById('scoreDesc').textContent = desc;
     document.getElementById('timeDisplay').textContent = '\u23f1 Completed in ' + formatTime(elapsedSeconds);
