@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewsGuard Reality Check — Quiz 7: 2026 World Cup</title>
+<link rel="icon" type="image/png" href="https://newsguard-reality-check.github.io/newsguard-quiz/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ng-blue: #3355dd;
+    --ng-blue-dark: #1e3ab8;
+    --ng-blue-light: #eef1fd;
+    --real: #16a34a;
+    --real-light: #dcfce7;
+    --fake: #dc2626;
+    --fake-light: #fee2e2;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(51,85,221,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 64px 0;
+  }
+
+  .header {
+    width: 100%;
+    background: var(--white);
+    border-bottom: 2px solid var(--ng-blue);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(51,85,221,0.07);
+  }
+
+  .ng-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+  }
+  .ng-badge img { width: 32px; height: 32px; object-fit: contain; }
+
+  .header-titles { display: flex; flex-direction: column; }
+  .header-title { font-size: 15px; font-weight: 700; color: var(--ng-blue); }
+  .header-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+  .header-timer {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ng-blue);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    background: var(--ng-blue-light);
+    padding: 6px 14px;
+    border-radius: 99px;
+    display: none;
+  }
+  .header-timer.visible { display: block; }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 680px;
+    padding: 20px 24px 0;
+    display: none;
+  }
+  .progress-bar-wrap.visible { display: block; }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .progress-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--ng-blue); border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 20px 24px 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: fadeUp 0.35s cubic-bezier(.4,0,.2,1);
+    display: none;
+  }
+  .card.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .media-wrap {
+    width: 100%;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    max-height: 380px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .media-wrap img { width: 100%; max-height: 380px; object-fit: contain; display: block; }
+
+  .claim-section { padding: 20px 24px 0; }
+  .claim-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--ng-blue); text-transform: uppercase; margin-bottom: 6px; }
+  .claim-text { font-size: 17px; font-weight: 600; line-height: 1.45; color: var(--text); }
+
+  .btn-row { display: flex; gap: 12px; padding: 20px 24px 24px; }
+
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 14px 0;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.13); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-real { background: var(--real); color: white; }
+  .btn-fake { background: var(--fake); color: white; }
+
+  .feedback {
+    margin: 0 24px 24px;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+    animation: fadeUp 0.25s ease;
+  }
+
+  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
+  .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; display: block; }
+  .feedback-verdict { font-weight: 700; font-size: 15px; }
+
+  .next-btn {
+    display: none;
+    width: calc(100% - 48px);
+    margin: 0 24px 24px;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+
+  .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+  .next-btn.visible { display: block; }
+
+  .screen {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+    margin: 20px 24px 0;
+    display: none;
+  }
+  .screen.visible { display: block; }
+
+  .screen h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+  .screen h1 span { color: var(--ng-blue); }
+  .screen p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 440px; margin: 0 auto 24px; }
+
+  .primary-btn {
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+
+  .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  /* REGISTRATION FORM (inline on start screen) */
+  .reg-form { text-align: left; max-width: 400px; margin: 0 auto; }
+  .form-field { margin-bottom: 14px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    background: white;
+  }
+  .form-field input:focus { border-color: var(--ng-blue); box-shadow: 0 0 0 3px var(--ng-blue-light); }
+  .form-field input.error { border-color: #dc2626; }
+
+  .reg-submit {
+    width: 100%;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.15s;
+  }
+  .reg-submit:hover { background: var(--ng-blue-dark); }
+
+  .reg-error { font-size: 13px; color: #dc2626; margin-top: 10px; text-align: center; display: none; }
+  .reg-error.visible { display: block; }
+
+  .score-badge {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--ng-blue);
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(51,85,221,0.25);
+  }
+
+  .score-tier {
+    font-size: 14px;
+    color: var(--ng-blue);
+    font-weight: 600;
+    background: var(--ng-blue-light);
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
+
+  .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
+  .score-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 20px; }
+
+  .submitted-msg { text-align: center; padding: 16px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; margin-top: 16px; display: none; }
+  .submitted-msg.visible { display: block; }
+
+  .admin-input {
+    width: 100%; max-width: 280px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-family: 'Sora', sans-serif; font-size: 15px;
+    margin: 16px 0 10px; outline: none; text-align: center; letter-spacing: 2px;
+  }
+  .admin-input:focus { border-color: var(--ng-blue); }
+  .admin-error { color: var(--fake); font-size: 13px; margin-top: 10px; display: none; }
+  .admin-error.visible { display: block; }
+
+  /* SHARE BUTTONS */
+  .share-section { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; text-align: center; }
+  .share-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .share-btn {
+    display: flex; align-items: center; gap: 7px;
+    border: none; border-radius: 9px;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 10px 16px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+    color: white; text-decoration: none;
+  }
+  .share-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .share-btn.x-btn    { background: #000000; }
+  .share-btn.fb-btn   { background: #1877f2; }
+  .share-btn.li-btn   { background: #0a66c2; }
+  .share-btn.copy-btn { background: var(--muted); }
+  .share-btn.copy-btn.copied { background: var(--real); }
+
+  .skip-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .skip-link:hover { color: var(--ng-blue); }
+
+  @media (max-width: 600px) {
+    .card, .screen, .progress-bar-wrap { margin-left: 12px; margin-right: 12px; }
+    .claim-text { font-size: 15px; }
+    .btn { font-size: 14px; padding: 12px 0; }
+    .screen { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="ng-badge"><img src="https://newsguard-reality-check.github.io/newsguard-quiz/favicon.png" alt="NewsGuard" /></div>
+  <div class="header-titles">
+    <div class="header-title">NewsGuard's Reality Check</div>
+    <div class="header-sub">2026 World Cup Edition</div>
+  </div>
+  <div class="header-timer" id="headerTimer">0:00</div>
+</div>
+
+<!-- START SCREEN -->
+<div class="screen visible" id="startScreen">
+  <h1>Real or Fake: <span>The 2026 World Cup</span></h1>
+  <p>Some of these are real World Cup controversies. Others are fake claims that spread online in recent weeks. Can you spot the difference?<br><br>Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap.</p>
+  <div class="reg-form" style="margin-top:4px;">
+    <div class="form-field">
+      <label>Full Name</label>
+      <input type="text" id="regName" placeholder="Your name" autocomplete="name" />
+    </div>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitReg()" />
+    </div>
+    <button class="reg-submit" onclick="submitReg()">Start Quiz &#8594;</button>
+    <div class="reg-error" id="regError">Please enter your name and a valid email address.</div>
+  </div>
+  <div class="start-meta" style="margin-top:14px;">8 questions · Timer starts when you begin</div>
+  <br>
+  <a class="skip-link" onclick="showAdminLogin()">Admin access</a>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap" id="progressWrap">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 of 8</span>
+    <span id="scoreLabel">0 correct</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="card" id="questionCard">
+  <div class="media-wrap" id="mediaWrap"></div>
+  <div class="claim-section">
+    <div class="claim-label">Claim</div>
+    <div class="claim-text" id="claimText"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-real" id="btnReal" onclick="answer('Real')">&#10003; Real</button>
+    <button class="btn btn-fake" id="btnFake" onclick="answer('Fake')">&#10007; Fake</button>
+  </div>
+  <div class="feedback" id="feedback">
+    <div class="feedback-verdict" id="feedbackVerdict"></div>
+  </div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question &#8594;</button>
+</div>
+
+<!-- SCORE SCREEN -->
+<div class="screen" id="scoreScreen">
+  <div class="score-badge" id="scoreBadge"></div>
+  <h1 id="scoreTitle"></h1>
+  <div class="score-tier" id="scoreTier"></div>
+  <div class="time-display" id="timeDisplay"></div>
+  <p id="scoreDesc"></p>
+
+  <div class="submitted-msg visible" id="autoEnteredMsg">&#10003; Your result has been recorded. We'll contact you if you win.</div>
+
+  <div class="share-section">
+    <div class="share-label">Share your result</div>
+    <div class="share-buttons">
+      <button class="share-btn x-btn" onclick="shareX()">𝕏 X</button>
+      <button class="share-btn fb-btn" onclick="shareFacebook()">f Facebook</button>
+      <button class="share-btn li-btn" onclick="shareLinkedIn()">in LinkedIn</button>
+      <button class="share-btn copy-btn" id="copyBtn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="screen" id="adminLogin">
+  <h1>Admin <span>Access</span></h1>
+  <p>Enter the password to access the leaderboard.</p>
+  <input class="admin-input" type="password" id="adminPassword" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
+  <br>
+  <button class="primary-btn" onclick="checkAdmin()">Enter</button>
+  <div class="admin-error" id="adminError">Incorrect password. Try again.</div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="screen" id="adminDashboard">
+  <h1>🏆 <span>Leaderboard</span></h1>
+  <p>All entries are saved to your Google Sheet in real time.</p>
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn">Open Google Sheets →</a>
+  <br><br>
+  <div style="font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin:0 auto;">
+    To find the winner: sort column D (Score) descending, then column E (Time in seconds) ascending.
+  </div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<script>
+  var SHEET_URL = "https://script.google.com/macros/s/AKfycbwz7j5vGV58qojLu7bJ3rP70ZMjhYHluFPsRbJDCSuYBWxF_xxV4XlgYPRIATW7s88RTA/exec";
+  var ADMIN_PASSWORD = "NewsGuard25";
+  var IMAGE_BASE = "https://newsguard-reality-check.github.io/newsguard-quiz/";
+  var QUIZ_URL = "https://newsguard-reality-check.github.io/newsguard-quiz/Index7.html";
+
+  var questions = [
+    {
+      file: "Photo_01.jpg",
+      claim: "Swedish soccer player Lucas Bergvall urged fans in an interview to \u201cstop voting for mass immigration\u201d",
+      answer: "Fake"
+    },
+    {
+      file: "Photo_02.jpg",
+      claim: "The French national team flew on an aircraft used for U.S. ICE deportation flights",
+      answer: "Real"
+    },
+    {
+      file: "Photo_03.jpg",
+      claim: "German national team captain Joshua Kimmich endorsed the far-right Alternative for Germany party in a post-match interview",
+      answer: "Fake"
+    },
+    {
+      file: "Photo_04.jpg",
+      claim: "The U.S. deported Iranian soccer player Mohammad Mohebi for making a finger-gun celebration gesture",
+      answer: "Fake"
+    },
+    {
+      file: "Photo_05.jpg",
+      claim: "A Paraguayan senator called French soccer star Kylian Mbapp\u00e9 a \u201cbrute\u201d who never learned how to write",
+      answer: "Real"
+    },
+    {
+      file: "Photo_06.jpg",
+      claim: "The opening ceremony in Mexico featured an extravagant float celebrating Iran",
+      answer: "Fake"
+    },
+    {
+      file: "Photo_07.jpg",
+      claim: "Trump said that if the U.S. loses to Belgium, \u2018it was rigged, just like the election was rigged in 2020\u2019",
+      answer: "Real"
+    },
+    {
+      file: "Photo_08.jpg",
+      claim: "Iran\u2019s team was forced to move its base camp from Arizona to Mexico",
+      answer: "Real"
+    }
+  ];
+
+  var current = 0, score = 0, answered = false;
+  var timerInterval = null, elapsedSeconds = 0;
+  var playerName = '', playerEmail = '';
+
+  function formatTime(s) {
+    return Math.floor(s/60) + ':' + (s%60).toString().padStart(2,'0');
+  }
+
+  function showScreen(id) {
+    ['startScreen','adminLogin','adminDashboard','scoreScreen'].forEach(function(s) {
+      document.getElementById(s).classList.remove('visible');
+    });
+    document.getElementById('progressWrap').classList.remove('visible');
+    document.getElementById('questionCard').classList.remove('visible');
+    document.getElementById(id).classList.add('visible');
+  }
+
+  function submitReg() {
+    var name = document.getElementById('regName').value.trim();
+    var email = document.getElementById('regEmail').value.trim();
+    var nameInput = document.getElementById('regName');
+    var emailInput = document.getElementById('regEmail');
+    var errorEl = document.getElementById('regError');
+
+    nameInput.classList.remove('error');
+    emailInput.classList.remove('error');
+    errorEl.classList.remove('visible');
+
+    var valid = true;
+    if (!name) { nameInput.classList.add('error'); valid = false; }
+    if (!email || email.indexOf('@') === -1) { emailInput.classList.add('error'); valid = false; }
+
+    if (!valid) {
+      errorEl.classList.add('visible');
+      return;
+    }
+
+    playerName = name;
+    playerEmail = email;
+    startQuiz();
+  }
+
+  function startQuiz() {
+    current = 0; score = 0; answered = false;
+    document.getElementById('startScreen').classList.remove('visible');
+    document.getElementById('progressWrap').classList.add('visible');
+    document.getElementById('questionCard').classList.add('visible');
+    document.getElementById('headerTimer').classList.add('visible');
+    startTimer();
+    loadQuestion();
+  }
+
+  function startTimer() {
+    elapsedSeconds = 0;
+    clearInterval(timerInterval);
+    document.getElementById('headerTimer').textContent = '0:00';
+    timerInterval = setInterval(function() {
+      elapsedSeconds++;
+      document.getElementById('headerTimer').textContent = formatTime(elapsedSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() { clearInterval(timerInterval); }
+
+  function loadQuestion() {
+    answered = false;
+    var q = questions[current];
+    document.getElementById('progressLabel').textContent = 'Question ' + (current + 1) + ' of ' + questions.length;
+    document.getElementById('scoreLabel').textContent = score + ' correct';
+    document.getElementById('progressFill').style.width = (current / questions.length) * 100 + '%';
+
+    var mediaWrap = document.getElementById('mediaWrap');
+    mediaWrap.innerHTML = '<img src="' + IMAGE_BASE + q.file + '" alt="Photo for question ' + (current + 1) + '" />';
+
+    document.getElementById('claimText').textContent = q.claim;
+    document.getElementById('btnReal').disabled = false;
+    document.getElementById('btnFake').disabled = false;
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('nextBtn').classList.remove('visible');
+
+    var card = document.getElementById('questionCard');
+    card.style.animation = 'none'; card.offsetHeight;
+    card.style.animation = 'fadeUp 0.35s cubic-bezier(.4,0,.2,1)';
+  }
+
+  function answer(choice) {
+    if (answered) return;
+    answered = true;
+    var q = questions[current];
+    var correct = choice === q.answer;
+    if (correct) score++;
+
+    document.getElementById('btnReal').disabled = true;
+    document.getElementById('btnFake').disabled = true;
+
+    var feedback = document.getElementById('feedback');
+    document.getElementById('feedbackVerdict').textContent = correct
+      ? '\u2713 Correct \u2014 This is ' + q.answer
+      : '\u2717 Incorrect \u2014 This is actually ' + q.answer;
+    feedback.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+
+    var nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = current < questions.length - 1 ? 'Next Question \u2192' : 'See My Results \u2192';
+    nextBtn.classList.add('visible');
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) showScore();
+    else loadQuestion();
+  }
+
+  function showScore() {
+    stopTimer();
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('headerTimer').classList.remove('visible');
+    document.getElementById('progressWrap').classList.remove('visible');
+    document.getElementById('questionCard').classList.remove('visible');
+    document.getElementById('scoreScreen').classList.add('visible');
+
+    var pct = score / questions.length;
+    var tier, desc;
+    if (pct === 1)        { tier = "World Cup Truth Expert";       desc = "Perfect score. You identified every claim correctly. Your eye for World Cup misinformation is sharp."; }
+    else if (pct >= 0.75) { tier = "Highly Discerning Reader";     desc = "You caught most of the fakes. A few slipped by, but your instincts are strong."; }
+    else if (pct >= 0.5)  { tier = "Informed but Vulnerable";      desc = "You identified many claims correctly, but some misinformation got through. Keep questioning what you see online."; }
+    else                  { tier = "Susceptible to World Cup Fakes"; desc = "Several fabricated claims fooled you. Sports misinformation spreads fast \u2014 always verify before sharing."; }
+
+    document.getElementById('scoreBadge').textContent = score + '/' + questions.length;
+    document.getElementById('scoreTitle').textContent = score === questions.length ? "Perfect Score!" : score >= 6 ? "Well Done!" : score >= 4 ? "Room to Improve" : "Keep Practicing";
+    document.getElementById('scoreTier').textContent = tier;
+    document.getElementById('scoreDesc').textContent = desc;
+    document.getElementById('timeDisplay').textContent = '\u23f1 Completed in ' + formatTime(elapsedSeconds);
+
+    submitToSheet();
+  }
+
+  function submitToSheet() {
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quiz: 'Quiz7-WorldCup', name: playerName, email: playerEmail, score: score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds) })
+    }).catch(function() {});
+  }
+
+  function showAdminLogin() {
+    showScreen('adminLogin');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminError').classList.remove('visible');
+  }
+
+  function checkAdmin() {
+    if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+      showScreen('adminDashboard');
+    } else {
+      document.getElementById('adminError').classList.add('visible');
+    }
+  }
+
+  function shareX() {
+    var text = 'I scored ' + score + '/' + questions.length + ' on NewsGuard\'s 2026 World Cup quiz \u2014 can you spot the fake claims? ' + QUIZ_URL;
+    window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
+  }
+
+  function shareFacebook() {
+    window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(QUIZ_URL), '_blank');
+  }
+
+  function shareLinkedIn() {
+    var text = 'I scored ' + score + '/' + questions.length + ' on NewsGuard\'s 2026 World Cup quiz \u2014 can you spot the fake claims? ' + QUIZ_URL;
+    window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(QUIZ_URL) + '&summary=' + encodeURIComponent(text), '_blank');
+  }
+
+  function copyLink() {
+    var text = 'I scored ' + score + '/' + questions.length + ' on NewsGuard\'s 2026 World Cup quiz \u2014 can you spot the fake claims? ' + QUIZ_URL;
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('copyBtn');
+      btn.textContent = '\u2713 Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { btn.textContent = '\ud83d\udd17 Copy Link'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+
+</script>
+</body>
+</html>
