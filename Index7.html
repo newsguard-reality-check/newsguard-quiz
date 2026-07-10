@@ -332,11 +332,15 @@
   .skip-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
   .skip-link:hover { color: var(--ng-blue); }
 
+  .promo-banner { margin: 20px -32px 0; }
+  .promo-banner img { width: 100%; display: block; }
+
   @media (max-width: 600px) {
     .card, .screen, .progress-bar-wrap { margin-left: 12px; margin-right: 12px; }
     .claim-text { font-size: 15px; }
     .btn { font-size: 14px; padding: 12px 0; }
     .screen { padding: 28px 20px; }
+    .promo-banner { margin: 20px -20px 0; }
   }
 </style>
 </head>
@@ -410,9 +414,9 @@
 
   <div class="submitted-msg visible" id="autoEnteredMsg">&#10003; Your result has been recorded. We'll contact you if you win.</div>
 
-  <div style="margin-top:20px;">
+  <div class="promo-banner">
     <a href="https://www.newsguard.ai/shared/b382cc42-70a1-4ceb-b18f-4e254ed3b5fc" target="_blank" rel="noopener">
-      <img src="https://newsguard-reality-check.github.io/newsguard-quiz/NewsGuardAI.jpg" alt="NewsGuard AI" style="width:100%; max-width:400px; border-radius:10px; display:block; margin:0 auto;" />
+      <img src="https://newsguard-reality-check.github.io/newsguard-quiz/NewsGuardAI.jpg" alt="NewsGuard AI" />
     </a>
   </div>
 
