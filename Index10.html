@@ -620,11 +620,9 @@
     document.getElementById('btnReal').disabled = true;
     document.getElementById('btnFake').disabled = true;
 
-    var verdictText = q.answer === 'Real' ? 'he really said this' : 'a fake quote';
+    var trueStatement = q.answer === 'Real' ? 'He really said this.' : 'This is a fake quote.';
     var feedback = document.getElementById('feedback');
-    document.getElementById('feedbackVerdict').textContent = correct
-      ? '✓ Correct — This is ' + verdictText
-      : '✗ Incorrect — This is actually ' + verdictText;
+    document.getElementById('feedbackVerdict').textContent = (correct ? '✓ Correct — ' : '✗ Incorrect — ') + trueStatement;
     feedback.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
 
     var nextBtn = document.getElementById('nextBtn');
