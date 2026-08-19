@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Did Trump Really Say This? | NewsGuard Reality Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Georgia&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ng-blue: #3355dd;
+    --ng-blue-dark: #1e3ab8;
+    --ng-blue-light: #eef1fd;
+    --real: #16a34a;
+    --real-light: #dcfce7;
+    --fake: #dc2626;
+    --fake-light: #fee2e2;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(51,85,221,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 48px 0;
+  }
+
+  .header {
+    width: 100%;
+    background: var(--white);
+    border-bottom: 2px solid var(--ng-blue);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 62px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(51,85,221,0.07);
+  }
+
+  .ng-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--ng-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .header-title { font-size: 15px; font-weight: 700; color: var(--ng-blue); }
+  .header-sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 1px; }
+
+  .header-timer {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ng-blue);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    background: var(--ng-blue-light);
+    padding: 6px 14px;
+    border-radius: 99px;
+  }
+
+  .screen {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+    margin: 20px 24px 0;
+  }
+
+  .screen h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+  .screen h1 span { color: var(--ng-blue); }
+  .screen p { font-size: 15px; color: var(--muted); line-height: 1.65; max-width: 460px; margin: 0 auto 24px; }
+
+  .primary-btn {
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .primary-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+
+  .start-meta { font-size: 12px; color: var(--muted); margin-top: 14px; }
+
+  .progress-bar-wrap {
+    width: 100%;
+    max-width: 680px;
+    padding: 20px 24px 0;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .progress-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--ng-blue); border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 20px 24px 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: fadeUp 0.35s cubic-bezier(.4,0,.2,1);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* QUOTE CARD */
+  .quote-wrap {
+    width: 100%;
+    background: #0f172a;
+    padding: 40px 28px 32px;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .quote-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 99px;
+    backdrop-filter: blur(4px);
+  }
+
+  .quote-num {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .quote-mark {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 52px;
+    line-height: 1;
+    color: var(--ng-blue);
+    opacity: 0.6;
+    margin-bottom: -10px;
+  }
+
+  .quote-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.55;
+    color: #fff;
+  }
+
+  .claim-section { padding: 18px 24px 0; }
+  .claim-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--ng-blue); text-transform: uppercase; margin-bottom: 6px; }
+
+  .btn-row { display: flex; gap: 12px; padding: 20px 24px 24px; }
+
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 14px 0;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.13); }
+  .btn:active:not(:disabled) { transform: translateY(0); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-real { background: var(--real); color: white; }
+  .btn-fake { background: var(--fake); color: white; }
+
+  .feedback {
+    margin: 0 24px 24px;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    display: none;
+    animation: fadeUp2 0.25s ease;
+  }
+
+  @keyframes fadeUp2 {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback.correct { background: var(--real-light); border-left: 4px solid var(--real); color: #14532d; display: block; }
+  .feedback.incorrect { background: var(--fake-light); border-left: 4px solid var(--fake); color: #7f1d1d; display: block; }
+  .feedback-verdict { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .feedback-text { font-size: 13px; color: inherit; opacity: 0.9; }
+
+  .next-btn {
+    display: none;
+    width: calc(100% - 48px);
+    margin: 0 24px 24px;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+  }
+
+  .next-btn:hover { background: var(--ng-blue-dark); transform: translateY(-1px); }
+  .next-btn.visible { display: block; }
+
+  .score-badge {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    background: var(--ng-blue);
+    color: white;
+    font-size: 30px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(51,85,221,0.25);
+  }
+
+  .score-tier {
+    font-size: 14px;
+    color: var(--ng-blue);
+    font-weight: 600;
+    background: var(--ng-blue-light);
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 99px;
+    margin-bottom: 14px;
+  }
+
+  .time-display { font-size: 13px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
+
+  /* TIPS */
+  .tips-section { text-align: left; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 22px; }
+  .tips-section h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--text); text-align: center; }
+  .tip-item { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+  .tip-item:last-child { margin-bottom: 0; }
+  .tip-num {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--ng-blue-light);
+    color: var(--ng-blue);
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .tip-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .tip-text strong { color: var(--text); }
+
+  /* NEWSGUARD.AI CTA */
+  .cta-section { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 22px; text-align: center; }
+  .cta-text { font-size: 14px; color: var(--text); font-weight: 600; margin-bottom: 12px; }
+  .cta-text strong { color: var(--ng-blue); }
+  .cta-link { display: block; border-radius: 10px; overflow: hidden; }
+  .cta-image { width: 100%; max-width: 100%; display: block; border-radius: 10px; transition: opacity 0.15s; }
+  .cta-link:hover .cta-image { opacity: 0.9; }
+
+  /* START SCREEN LEAD FORM */
+  .start-form { max-width: 320px; margin: 0 auto 20px; text-align: left; }
+
+  /* ENTRY FORM / PRIZE */
+  .entry-form { text-align: left; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 24px; }
+  .entry-form h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .entry-form p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  .form-field { margin-bottom: 12px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-field input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-field input:focus { border-color: var(--ng-blue); }
+
+  .form-submit {
+    width: 100%;
+    background: var(--ng-blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  .form-submit:hover:not(:disabled) { background: var(--ng-blue-dark); }
+  .form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .skip-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  .skip-link:hover { color: var(--ng-blue); }
+
+  .submitted-msg { text-align: center; padding: 16px; background: var(--real-light); border-radius: 10px; color: #14532d; font-weight: 600; font-size: 14px; margin-top: 16px; }
+  .error-msg { text-align: center; padding: 12px; background: var(--fake-light); border-radius: 10px; color: #7f1d1d; font-size: 13px; margin-top: 12px; }
+
+  .admin-input {
+    width: 100%; max-width: 280px;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-family: 'Sora', sans-serif; font-size: 15px;
+    margin: 16px 0 10px; outline: none; text-align: center; letter-spacing: 2px;
+  }
+  .admin-input:focus { border-color: var(--ng-blue); }
+  .admin-error { color: var(--fake); font-size: 13px; margin-top: 10px; }
+
+  /* SHARE BUTTONS */
+  .share-section { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; }
+  .share-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+  .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .share-btn {
+    display: flex; align-items: center; gap: 7px;
+    border: none; border-radius: 9px;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 10px 16px; cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+    color: white; text-decoration: none;
+  }
+  .share-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .share-btn.x-btn    { background: #000000; }
+  .share-btn.fb-btn   { background: #1877f2; }
+  .share-btn.li-btn   { background: #0a66c2; }
+  .share-btn.copy-btn { background: var(--muted); }
+  .share-btn.copy-btn.copied { background: var(--real); }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .card, .screen, .progress-bar-wrap { margin-left: 12px; margin-right: 12px; }
+    .quote-text { font-size: 17px; }
+    .btn { font-size: 14px; padding: 12px 0; }
+    .screen { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="ng-badge">NG</div>
+  <div>
+    <div class="header-title">NewsGuard's Reality Check</div>
+    <div class="header-sub">Real or Fake?</div>
+  </div>
+  <div class="header-timer hidden" id="headerTimer">0:00</div>
+</div>
+
+<!-- START SCREEN -->
+<div class="screen" id="startScreen">
+  <h1>Did Trump Really <span>Say This?</span></h1>
+  <p>Five of the quotes in this quiz are from President Trump this week. Five are completely made up. Can you tell a real Trump quote from a fake? Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap.</p>
+  <div class="start-form">
+    <div class="form-field">
+      <label>Full Name *</label>
+      <input type="text" id="startName" placeholder="Your name" required />
+    </div>
+    <div class="form-field">
+      <label>Email Address *</label>
+      <input type="email" id="startEmail" placeholder="your@email.com" required />
+    </div>
+  </div>
+  <button class="primary-btn" onclick="startQuiz()">Start Quiz →</button>
+  <div class="start-meta">10 quotes · Timer starts when you begin</div>
+  <div style="margin-top:24px">
+    <a class="skip-link" onclick="showAdminLogin()">Admin access</a>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap hidden" id="progressWrap">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 of 10</span>
+    <span id="scoreLabel">0 correct</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="card hidden" id="questionCard">
+  <div class="quote-wrap" id="quoteWrap">
+    <div class="quote-tag" id="quoteTag"></div>
+    <div class="quote-num" id="quoteNum"></div>
+    <div class="quote-mark">&ldquo;</div>
+    <div class="quote-text" id="quoteText"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-real" id="btnReal" onclick="answer('Real')">✓ Real</button>
+    <button class="btn btn-fake" id="btnFake" onclick="answer('Fake')">✗ Fake</button>
+  </div>
+  <div class="feedback" id="feedback">
+    <div class="feedback-verdict" id="feedbackVerdict"></div>
+    <div class="feedback-text" id="feedbackText"></div>
+  </div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+</div>
+
+<!-- SCORE SCREEN -->
+<div class="screen hidden" id="scoreScreen">
+  <div class="score-badge" id="scoreBadge"></div>
+  <h1 id="scoreTitle"></h1>
+  <div class="score-tier" id="scoreTier"></div>
+  <div class="time-display" id="timeDisplay"></div>
+  <p id="scoreDesc"></p>
+
+  <div class="tips-section">
+    <h3>How to Spot a Fake Quote</h3>
+    <div class="tip-item">
+      <div class="tip-num">1</div>
+      <div class="tip-text"><strong>Look for a primary source.</strong> A real quote should trace back to video, audio, or a wire-service transcript — not just a screenshot or a repost.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-num">2</div>
+      <div class="tip-text"><strong>Watch for "too perfect" phrasing.</strong> Fabricated quotes often nail someone's tone but read like a caricature — every verbal tic packed into one line.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-num">3</div>
+      <div class="tip-text"><strong>Check the specifics.</strong> Fake quotes tend to fall apart on a concrete detail — a date, a number, a name — that doesn't match the public record.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-num">4</div>
+      <div class="tip-text"><strong>Search before you share.</strong> A quick search usually surfaces the original remarks — or confirms that nothing matches.</div>
+    </div>
+    <div class="tip-item">
+      <div class="tip-num">5</div>
+      <div class="tip-text"><strong>Consider the source.</strong> Accounts with a track record of spreading misinformation are more likely to be sharing a fabricated quote in the first place.</div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <p class="cta-text">Want to learn more? Try <strong>NewsGuard.AI</strong>.</p>
+    <a class="cta-link" href="https://www.newsguard.ai/shared/de98f4cb-0093-47cf-b55b-1499a8c2140a" target="_blank" rel="noopener">
+      <img class="cta-image" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgNjAwIDIwMCI+CiAgPHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNlZWYxZmQiLz4KICA8cmVjdCB4PSI0IiB5PSI0IiB3aWR0aD0iNTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzM1NWRkIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjggNiIvPgogIDx0ZXh0IHg9IjMwMCIgeT0iOTUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzFlM2FiOCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+TmV3c0d1YXJkIEFJIENUQSAoOCkucG5nPC90ZXh0PgogIDx0ZXh0IHg9IjMwMCIgeT0iMTI1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiM2NDc0OGIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlBsYWNlaG9sZGVyIC0tIHN3YXAgaW4gdGhlIHJlYWwgaW1hZ2UgZmlsZTwvdGV4dD4KPC9zdmc+" alt="NewsGuard AI CTA" />
+    </a>
+  </div>
+
+  <div class="submitted-msg hidden" id="submittedMsg">
+    ✓ You're entered to win a NewsGuard cap. We'll contact you if you win.
+  </div>
+  <div class="error-msg hidden" id="submitError">Something went wrong submitting your entry.</div>
+
+  <div class="share-section">
+    <div class="share-label">Share your result</div>
+    <div class="share-buttons">
+      <button class="share-btn x-btn" onclick="shareX()">𝕏 X</button>
+      <button class="share-btn fb-btn" onclick="shareFacebook()">f Facebook</button>
+      <button class="share-btn li-btn" onclick="shareLinkedIn()">in LinkedIn</button>
+      <button class="share-btn copy-btn" id="copyBtn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="screen hidden" id="adminLogin">
+  <h1>Admin <span>Access</span></h1>
+  <p>Enter the password to access the leaderboard.</p>
+  <input class="admin-input" type="password" id="adminPassword" placeholder="••••••••••" onkeydown="if(event.key==='Enter')checkAdmin()" />
+  <br>
+  <button class="primary-btn" onclick="checkAdmin()">Enter</button>
+  <div class="admin-error hidden" id="adminError">Incorrect password. Try again.</div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="screen hidden" id="adminDashboard">
+  <h1>🏆 <span>Leaderboard</span></h1>
+  <p>All entries are saved to your Google Sheet in real time.</p>
+  <a href="https://docs.google.com/spreadsheets" target="_blank" class="primary-btn">Open Google Sheets →</a>
+  <br><br>
+  <div style="font-size:13px; color:var(--muted); line-height:1.6; max-width:380px; margin:0 auto;">
+    To find the winner: sort column D (Score) descending, then column E (Time in seconds) ascending.
+  </div>
+  <br><br>
+  <a class="skip-link" onclick="showScreen('startScreen')">← Back to quiz</a>
+</div>
+
+<script>
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwz7j5vGV58qojLu7bJ3rP70ZMjhYHluFPsRbJDCSuYBWxF_xxV4XlgYPRIATW7s88RTA/exec";
+  const ADMIN_PASSWORD = "NewsGuard25";
+
+  const questions = [
+    {
+      tag: "Press Conference",
+      quote: "You're a loud, boisterous person. You're fake news. Be quiet. Be quiet. Be quiet. You're a fake reporter and you report fake news.",
+      context: "to a CNN reporter during a press conference",
+      answer: "Real",
+      explanation: "Real. Trump said this to a CNN reporter during a press conference this week."
+    },
+    {
+      tag: "On The Economy",
+      quote: "We have an economy that is doing things nobody has ever seen before. The numbers are incredible. People are coming up to me, very wealthy people, very successful people, and they're saying, 'Sir, we've never seen anything like this.' And they're right. They've never seen anything like it.",
+      context: "speaking about the economy",
+      answer: "Fake",
+      explanation: "Fake. This quote was written for this quiz — Trump did not actually say this. It borrows his familiar cadence and phrasing about the economy, but the line itself is invented."
+    },
+    {
+      tag: "Strait Of Hormuz",
+      quote: "If Oman gets in the way, we'll bomb the s*** out of them.",
+      context: "on the Strait of Hormuz",
+      answer: "Real",
+      explanation: "Real. Trump made this comment about the Strait of Hormuz this week."
+    },
+    {
+      tag: "White House Helipad",
+      quote: "That's stone that, if you took a hammer and you started hammering right now — all day long — you wouldn't see a mark on it, literally, that's the kind of power it is.",
+      context: "showing the press the new White House helipad",
+      answer: "Real",
+      explanation: "Real. Trump said this while showing the press the new White House helipad this week."
+    },
+    {
+      tag: "White House Ballroom",
+      quote: "We're building a ballroom that's going to be magnificent. It's going to be the greatest ballroom anywhere in the world, probably by far. People are going to walk in and say, 'How did they do this?' And we did it very quickly, too. Nobody thought it could be done.",
+      context: "on the White House ballroom",
+      answer: "Fake",
+      explanation: "Fake. This quote was written for this quiz — Trump did not actually say this. It echoes how he has talked about the ballroom project, but the specific line is fabricated."
+    },
+    {
+      tag: "On The Military",
+      quote: "Nobody respects our military more than I do. Nobody. We have the greatest generals, the strongest generals. And frankly, other countries don't even understand. They look at what we have and they say, 'Wow.' That's what they say. They say, 'Wow.'",
+      context: "on the military",
+      answer: "Fake",
+      explanation: "Fake. This quote was written for this quiz — Trump did not actually say this, even though the rhetorical style is meant to sound familiar."
+    },
+    {
+      tag: "Air Force One",
+      quote: "They spent years saying I couldn't do it. They are very angry people. They said, 'Trump can't do this, Trump can't do that.' Who's laughing now?",
+      context: "before boarding Air Force One",
+      answer: "Fake",
+      explanation: "Fake. This quote was written for this quiz — Trump did not actually say this before boarding Air Force One this week."
+    },
+    {
+      tag: "NYPD Academy",
+      quote: "[We had] wide open borders with millions and millions of people pouring in from all over the world, including prisons and jails and mental institutions and insane asylums. You know what that is? That's a mental institution on steroids.",
+      context: "speaking at the New York Police Academy",
+      answer: "Real",
+      explanation: "Real. Trump said this while speaking at the New York Police Academy this week."
+    },
+    {
+      tag: "On Kim Jong Un",
+      quote: "I get along with everybody. I get along with the toughest people in the world. They respect me, and I respect them. It's all the art of the deal.",
+      context: "on his relationship with Kim Jong Un",
+      answer: "Fake",
+      explanation: "Fake. This quote was written for this quiz — Trump did not actually say this line about Kim Jong Un this week."
+    },
+    {
+      tag: "To Reporters",
+      quote: "For 15 straight months, we had zero people crossing the border. Are you impressed? Is anybody impressed? You are. Thank you. I'll give you the first question.",
+      context: "speaking to reporters",
+      answer: "Real",
+      explanation: "Real. Trump said this to reporters this week."
+    }
+  ];
+
+  let current = 0, score = 0, answered = false;
+  let timerInterval = null, elapsedSeconds = 0;
+  let leadName = '', leadEmail = '';
+
+  function startTimer() {
+    elapsedSeconds = 0;
+    clearInterval(timerInterval);
+    document.getElementById('headerTimer').classList.remove('hidden');
+    timerInterval = setInterval(() => {
+      elapsedSeconds++;
+      document.getElementById('headerTimer').textContent = formatTime(elapsedSeconds);
+    }, 1000);
+  }
+
+  function stopTimer() { clearInterval(timerInterval); }
+
+  function formatTime(s) {
+    return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+  }
+
+  function showScreen(id) {
+    ['startScreen','progressWrap','questionCard','scoreScreen','adminLogin','adminDashboard']
+      .forEach(s => { const el = document.getElementById(s); if (el) el.classList.add('hidden'); });
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function startQuiz() {
+    const name = document.getElementById('startName').value.trim();
+    const email = document.getElementById('startEmail').value.trim();
+    if (!name || !email) { alert('Please enter your name and email to start the quiz.'); return; }
+    if (!email.includes('@')) { alert('Please enter a valid email address.'); return; }
+    leadName = name;
+    leadEmail = email;
+
+    current = 0; score = 0; answered = false;
+    showScreen('progressWrap');
+    document.getElementById('questionCard').classList.remove('hidden');
+    startTimer();
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    answered = false;
+    const q = questions[current];
+    document.getElementById('progressLabel').textContent = `Question ${current + 1} of ${questions.length}`;
+    document.getElementById('scoreLabel').textContent = `${score} correct`;
+    document.getElementById('progressFill').style.width = `${(current / questions.length) * 100}%`;
+
+    document.getElementById('quoteTag').textContent = q.tag;
+    document.getElementById('quoteNum').textContent = `Q${current + 1} / ${questions.length}`;
+    document.getElementById('quoteText').textContent = `${q.quote}”`;
+
+    document.getElementById('btnReal').disabled = false;
+    document.getElementById('btnFake').disabled = false;
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('nextBtn').classList.remove('visible');
+
+    const card = document.getElementById('questionCard');
+    card.style.animation = 'none'; card.offsetHeight;
+    card.style.animation = 'fadeUp 0.35s cubic-bezier(.4,0,.2,1)';
+  }
+
+  function answer(choice) {
+    if (answered) return;
+    answered = true;
+    const q = questions[current];
+    const correct = choice === q.answer;
+    if (correct) score++;
+
+    document.getElementById('btnReal').disabled = true;
+    document.getElementById('btnFake').disabled = true;
+
+    const feedback = document.getElementById('feedback');
+    document.getElementById('feedbackVerdict').textContent = correct
+      ? `✓ Correct — This is ${q.answer}`
+      : `✗ Incorrect — This is actually ${q.answer}`;
+    document.getElementById('feedbackText').textContent = q.explanation;
+    feedback.className = `feedback ${correct ? 'correct' : 'incorrect'}`;
+
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = current < questions.length - 1 ? 'Next Question →' : 'See My Results →';
+    nextBtn.classList.add('visible');
+  }
+
+  function nextQuestion() {
+    current++;
+    if (current >= questions.length) showScore();
+    else loadQuestion();
+  }
+
+  function showScore() {
+    stopTimer();
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('headerTimer').classList.add('hidden');
+    showScreen('scoreScreen');
+
+    const pct = score / questions.length;
+    let tier, desc;
+    if (pct === 1)       { tier = "Quote Detective";     desc = "Perfect score. You caught every real quote and every fabrication — nothing got past you."; }
+    else if (pct >= 0.8) { tier = "Sharp-Eyed Reader";    desc = "You caught most of them. A couple of curveballs got through, but your instincts are strong."; }
+    else if (pct >= 0.6) { tier = "Getting There";        desc = "You spotted more than half. Some of these fakes were written to sound just like him — stay skeptical."; }
+    else if (pct >= 0.4) { tier = "Easily Fooled";        desc = "Several fabricated quotes slipped past you. It's easy to mistake a good impression for the real thing."; }
+    else                 { tier = "Back To The Source";   desc = "Most of the fakes fooled you this time. Always check the original transcript or video before trusting a quote."; }
+
+    document.getElementById('scoreBadge').textContent = `${score}/10`;
+    document.getElementById('scoreTitle').textContent = score === 10 ? "Perfect Score!" : score >= 7 ? "Well Done!" : score >= 5 ? "Not Bad!" : "Keep Practicing";
+    document.getElementById('scoreTier').textContent = tier;
+    document.getElementById('scoreDesc').textContent = desc;
+    document.getElementById('timeDisplay').textContent = `⏱ Completed in ${formatTime(elapsedSeconds)}`;
+    document.getElementById('submittedMsg').classList.add('hidden');
+    document.getElementById('submitError').classList.add('hidden');
+    submitEntry();
+  }
+
+  function submitEntry() {
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: leadName, email: leadEmail, score, seconds: elapsedSeconds, timeFormatted: formatTime(elapsedSeconds), quiz: 'Did Trump Really Say This?' })
+    })
+    .then(() => {
+      document.getElementById('submittedMsg').classList.remove('hidden');
+    })
+    .catch(() => {
+      document.getElementById('submitError').classList.remove('hidden');
+    });
+  }
+
+  function showAdminLogin() {
+    showScreen('adminLogin');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminError').classList.add('hidden');
+  }
+
+  function checkAdmin() {
+    if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+      showScreen('adminDashboard');
+    } else {
+      document.getElementById('adminError').classList.remove('hidden');
+    }
+  }
+
+  function shareX() {
+    const text = `I scored ${score}/10 on NewsGuard's "Did Trump Really Say This?" quiz — can you tell a real quote from a fake?`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+  }
+
+  function shareFacebook() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+  }
+
+  function shareLinkedIn() {
+    const text = `I scored ${score}/10 on NewsGuard's "Did Trump Really Say This?" quiz — can you tell a real quote from a fake?`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}&summary=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function copyLink() {
+    const text = `I scored ${score}/10 on NewsGuard's "Did Trump Really Say This?" quiz — can you tell a real quote from a fake? ${window.location.href}`;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '🔗 Copy Link'; btn.classList.remove('copied'); }, 2500);
+    });
+  }
+</script>
+</body>
+</html>
