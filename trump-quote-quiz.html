@@ -188,15 +188,6 @@
     font-weight: 700;
   }
 
-  .quote-mark {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 52px;
-    line-height: 1;
-    color: var(--ng-blue);
-    opacity: 0.6;
-    margin-bottom: -10px;
-  }
-
   .quote-text {
     font-family: Georgia, 'Times New Roman', serif;
     font-style: italic;
@@ -425,7 +416,7 @@
 <!-- START SCREEN -->
 <div class="screen" id="startScreen">
   <h1>Did Trump Really <span>Say This?</span></h1>
-  <p>Five of the quotes in this quiz are from President Trump this week. Five are completely made up. Can you tell a real Trump quote from a fake? Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap.</p>
+  <p>Five of the quotes in this quiz are from President Trump this week. Five others are completely made up. Can you tell a real Trump quote from a fake?<br><br>Your time will be recorded — the highest score in the shortest time wins a NewsGuard cap.</p>
   <div class="start-form">
     <div class="form-field">
       <label>Full Name *</label>
@@ -459,7 +450,6 @@
   <div class="quote-wrap" id="quoteWrap">
     <div class="quote-tag" id="quoteTag"></div>
     <div class="quote-num" id="quoteNum"></div>
-    <div class="quote-mark">&ldquo;</div>
     <div class="quote-text" id="quoteText"></div>
   </div>
   <div class="btn-row">
@@ -680,7 +670,7 @@
 
     document.getElementById('quoteTag').textContent = q.tag;
     document.getElementById('quoteNum').textContent = `Q${current + 1} / ${questions.length}`;
-    document.getElementById('quoteText').textContent = `${q.quote}”`;
+    document.getElementById('quoteText').textContent = `“${q.quote}”`;
 
     document.getElementById('btnReal').disabled = false;
     document.getElementById('btnFake').disabled = false;
