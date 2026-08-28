@@ -330,6 +330,8 @@
   .skip-link { display: block; text-align: center; margin-top: 10px; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; }
   .skip-link:hover { color: var(--ng-blue); }
 
+  .credit-line { margin-top: 22px; font-size: 11px; color: var(--muted); opacity: 0.7; text-align: center; }
+
   .promo-banner { margin: 20px -32px 0; }
   .promo-banner-label { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 0 32px; margin-bottom: 10px; }
   .promo-banner-label a { color: var(--ng-blue); text-decoration: underline; }
@@ -455,6 +457,8 @@
       <button class="share-btn copy-btn" id="copyBtn" onclick="copyLink()">🔗 Copy Link</button>
     </div>
   </div>
+
+  <div class="credit-line">Produced with the help of Claude Code</div>
 </div>
 
 <!-- ADMIN LOGIN -->
@@ -521,7 +525,7 @@
     {
       claim: "Mayo Clinic research provides evidence that measles infections protect against cancer.",
       answer: "False",
-      detail: "No such Mayo Clinic finding exists. This claim misrepresents legitimate research (some early-stage studies use modified measles virus in experimental cancer treatments, which is not the same as a natural infection offering protection)."
+      detail: "No such Mayo Clinic finding exists. This claim misrepresents legitimate research. Some early-stage studies use modified measles virus in experimental cancer treatments, which is not the same as a natural infection offering protection."
     },
     {
       claim: "Measles can essentially \"erase\" parts of the immune system's memory.",
